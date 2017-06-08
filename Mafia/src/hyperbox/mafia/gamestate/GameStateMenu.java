@@ -8,6 +8,7 @@ import java.io.File;
 
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.io.Settings;
+import hyperbox.mafia.server.GameServer;
 import hyperbox.mafia.ui.ButtonElement;
 import hyperbox.mafia.ui.TextBoxElement;
 import hyperbox.mafia.ui.TextElement;
@@ -41,7 +42,7 @@ public class GameStateMenu extends GameState {
 	
 	
 	
-	public GameStateMenu() {
+	public GameStateMenu(Game game) {
 		settings = new Settings(new File(SETTINGS_FILE_PATH), SETTINGS_COMMENT);
 		
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -61,10 +62,11 @@ public class GameStateMenu extends GameState {
 				30, settings.grabValue("connectPort", "21147"), "Port", UIAnchor.NEGATIVE, 5, TextBoxElement.NUMBER_CHARS);
 		
 		connectButtonElement = new ButtonElement(0, 240, UIAnchor.CENTER, UIAnchor.NEGATIVE, UIAnchor.CENTER, UIAnchor.NEGATIVE, 3.5f, "Connect", () -> {
-			System.out.println("Connect!");
+			writeSettings();
 			
 			if(!connectIpElement.isEmpty() && !connectPortElement.isEmpty()) {
-				writeSettings();
+				game.getGameStateManager().getGameStateInGame().enable(game);
+				game.getGameStateManager().getGameStateMenu().disable(game);
 			}
 		});
 		
@@ -74,30 +76,31 @@ public class GameStateMenu extends GameState {
 				30, settings.grabValue("hostPort", "21147"), "Port", UIAnchor.CENTER, 5, TextBoxElement.NUMBER_CHARS);
 		
 		hostButtonElement = new ButtonElement(100, -100, UIAnchor.CENTER, UIAnchor.POSITIVE, UIAnchor.CENTER, UIAnchor.CENTER, 3.5f, "Host", () -> {
-			System.out.println("Host!");
+			writeSettings();
 			
 			if(!hostPortElement.isEmpty()) {
-				writeSettings();
+				GameServer server = new GameServer(Integer.parseInt(hostPortElement.getText()));
+				server.startServer();
 			}
 		});
 		
 		
 		
 		usernameElement = new TextBoxElement(30, 50, UIAnchor.NEGATIVE, UIAnchor.CENTER, UIAnchor.NEGATIVE, UIAnchor.CENTER,
-				25, settings.grabValue("username", "User"), "Username", UIAnchor.NEGATIVE, 15, TextBoxElement.ALL_CHARS);
+				25, settings.grabValue("username", "Player"), "Username", UIAnchor.NEGATIVE, 15, TextBoxElement.ALL_CHARS);
 	}
 	
 	
 	
 	
 	@Override
-	protected void onEnable() {
+	protected void onEnable(Game game) {
 		
 	}
 
 	
 	@Override
-	protected void onDisable() {
+	protected void onDisable(Game game) {
 		
 	}
 
@@ -171,5 +174,11 @@ public class GameStateMenu extends GameState {
 	}
 	
 	
+	
+	
+	
+	public Settings getSettings() {
+		return settings;
+	}
 	
 }

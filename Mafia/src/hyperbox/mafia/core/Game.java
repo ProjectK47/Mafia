@@ -77,8 +77,8 @@ public class Game extends Canvas implements Runnable {
 		this.addMouseMotionListener(mouseInput);
 		
 		
-		gameStateManager = new GameStateManager();
-		gameStateManager.getGameStateMenu().enable();
+		gameStateManager = new GameStateManager(this);
+		gameStateManager.getGameStateMenu().enable(this);
 		
 		
 		camera = new Camera();

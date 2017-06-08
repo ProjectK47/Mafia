@@ -47,6 +47,21 @@ public class Settings {
 	
 	
 	
+	public String grabValueString(String key) {
+		String value = properties.getProperty(key);
+		
+		return value;
+	}
+	
+	
+	public int grabValueInt(String key) {
+		int value = Integer.parseInt(properties.getProperty(key));
+		
+		return value;
+	}
+	
+	
+	
 	
 	public void setValue(String key, String value) {
 		properties.setProperty(key, value);

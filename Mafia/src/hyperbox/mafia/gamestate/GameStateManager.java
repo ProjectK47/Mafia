@@ -9,6 +9,7 @@ public class GameStateManager {
 
 	
 	private GameStateMenu gameStateMenu;
+	private GameStateInGame gameStateInGame;
 	
 	
 	private LinkedList<GameState> gameStates = new LinkedList<GameState>();
@@ -16,8 +17,9 @@ public class GameStateManager {
 	
 	
 	
-	public GameStateManager() {
-		gameStateMenu = new GameStateMenu();
+	public GameStateManager(Game game) {
+		gameStateMenu = new GameStateMenu(game);
+		gameStateInGame = new GameStateInGame();
 		
 		
 		addGameStatesToList();
@@ -41,8 +43,17 @@ public class GameStateManager {
 	
 	
 	
+	public void disableAllStates(Game game) {
+		for(GameState state : gameStates)
+			state.disable(game);
+	}
+	
+	
+	
+	
 	private void addGameStatesToList() {
 		gameStates.add(gameStateMenu);
+		gameStates.add(gameStateInGame);
 	}
 	
 	
@@ -51,6 +62,11 @@ public class GameStateManager {
 	
 	public GameStateMenu getGameStateMenu() {
 		return gameStateMenu;
+	}
+	
+	
+	public GameStateInGame getGameStateInGame() {
+		return gameStateInGame;
 	}
 	
 }

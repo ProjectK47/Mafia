@@ -13,25 +13,25 @@ public abstract class GameState {
 
 	
 	
-	public void enable() {
+	public void enable(Game game) {
 		if(isEnabled)
 			return;
 		
 		
 		isEnabled = true;
 		
-		onEnable();
+		onEnable(game);
 	}
 	
 	
-	public void disable() {
+	public void disable(Game game) {
 		if(!isEnabled)
 			return;
 		
 		
 		isEnabled = false;
 		
-		onDisable();
+		onDisable(game);
 	}
 	
 	
@@ -50,8 +50,8 @@ public abstract class GameState {
 	
 	
 	
-	protected abstract void onEnable();
-	protected abstract void onDisable();
+	protected abstract void onEnable(Game game);
+	protected abstract void onDisable(Game game);
 	
 	protected abstract void onTick(Game game);
 	protected abstract void onRender(Graphics2D g, Game game);
