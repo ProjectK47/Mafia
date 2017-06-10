@@ -31,6 +31,22 @@ public class ImageResources {
 	public static BufferedImage grassBladesLeft;
 	public static BufferedImage grassBladesRight;
 	
+	public static BufferedImage player1FrontStill;
+	public static BufferedImage player1FrontWalk1;
+	public static BufferedImage player1FrontWalk2;
+	////
+	public static BufferedImage player1BackStill;
+	public static BufferedImage player1BackWalk1;
+	public static BufferedImage player1BackWalk2;
+	////
+	public static BufferedImage player1RightStill;
+	public static BufferedImage player1RightWalk1;
+	public static BufferedImage player1RightWalk2;
+	////
+	public static BufferedImage player1LeftStill;
+	public static BufferedImage player1LeftWalk1;
+	public static BufferedImage player1LeftWalk2;
+	
 	public static BufferedImage standardMap;
 	
 	
@@ -57,6 +73,22 @@ public class ImageResources {
 			grassBladesStill = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "grassBladesStill.png"));
 			grassBladesLeft = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "grassBladesLeft.png"));
 			grassBladesRight = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "grassBladesRight.png"));
+			
+			player1FrontStill = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1FrontStill.png"));
+			player1FrontWalk1 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1FrontWalk1.png"));
+			player1FrontWalk2 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1FrontWalk2.png"));
+			////
+			player1BackStill = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1BackStill.png"));
+			player1BackWalk1 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1BackWalk1.png"));
+			player1BackWalk2 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1BackWalk2.png"));
+			////
+			player1RightStill = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1RightStill.png"));
+			player1RightWalk1 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1RightWalk1.png"));
+			player1RightWalk2 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1RightWalk2.png"));
+			////
+			player1LeftStill = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1LeftStill.png"));
+			player1LeftWalk1 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1LeftWalk1.png"));
+			player1LeftWalk2 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1LeftWalk2.png"));
 			
 			standardMap = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "standardMap.png"));
 		} catch (IOException e) {

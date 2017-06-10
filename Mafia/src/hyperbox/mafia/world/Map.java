@@ -98,6 +98,20 @@ public class Map {
 	
 	
 	
+	public Tile grabTileAtCoords(float x, float y, Game game) {
+		int gridX = (int) (x + gridWidth / 2 * TILE_SIZE) / TILE_SIZE;
+		int gridY = (int) (y + gridHeight / 2 * TILE_SIZE) / TILE_SIZE;
+		
+		Tile tile = tiles[gridX][gridY];
+		
+		
+		return tile;
+	}
+	
+	
+	
+	
+	
 	
 	private void checkSpecialTile(int x, int y, Tile tile) {
 		if(tile == Tile.GRASS) {

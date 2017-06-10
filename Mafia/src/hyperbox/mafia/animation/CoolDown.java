@@ -17,6 +17,16 @@ public class CoolDown {
 	}
 	
 	
+	public CoolDown(int coolDownTicks, boolean shouldStartCompleted) {
+		this.coolDownTicks = coolDownTicks;	
+		
+		if(!shouldStartCompleted)
+			currentCoolDown = coolDownTicks;
+		else
+			currentCoolDown = 0;
+	}
+	
+	
 	
 	
 	public void tick() {	
@@ -34,6 +44,19 @@ public class CoolDown {
 		}
 	}
 	
+	
+	
+	
+	
+	
+	public void resetCurrentCoolDown() {
+		currentCoolDown = coolDownTicks;
+	}
+	
+	
+	public void rushCurrentCoolDown() {
+		currentCoolDown = 0;
+	}
 	
 	
 	

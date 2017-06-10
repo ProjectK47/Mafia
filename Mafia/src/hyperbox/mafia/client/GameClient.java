@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import hyperbox.mafia.net.Packet;
@@ -99,17 +98,20 @@ public class GameClient implements Runnable {
 	
 	
 	public void forEachReceivedPacket(PacketRunnable runnable) {
-		Iterator<Packet> iterator = receivedPackets.iterator();
+		ArrayList<Packet> packetsToRemove = new ArrayList<Packet>();
 		
-		while(iterator.hasNext()) {
-			Packet packet = iterator.next();
-			
+		
+		for(int i = 0; i < receivedPackets.size(); i ++) {
+			Packet packet = receivedPackets.get(i);
 			
 			runnable.run(packet);
 			
 			if(packet.isDisposed())
-				iterator.remove();
+				packetsToRemove.add(packet);
 		}
+		
+		
+		receivedPackets.removeAll(packetsToRemove);
 	}
 	
 	

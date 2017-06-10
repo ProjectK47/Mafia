@@ -232,4 +232,9 @@ public class Game extends Canvas implements Runnable {
 	}
 	
 	
+	public Map getMap() {
+		return map;
+	}
+	
+	
 }

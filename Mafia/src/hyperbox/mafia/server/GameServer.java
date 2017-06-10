@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 import hyperbox.mafia.net.Packet;
+import hyperbox.mafia.net.PacketPlayerDisconnect;
 import hyperbox.mafia.net.PacketPlayerProfile;
 
 public class GameServer implements Runnable {
@@ -49,6 +50,7 @@ public class GameServer implements Runnable {
 			while(true) {
 				Socket socket = serverSocket.accept();
 				DataInputStream in = new DataInputStream(socket.getInputStream());
+				String ip = socket.getRemoteSocketAddress().toString();
 				
 				Packet.readID(in);
 				PacketPlayerProfile profile = new PacketPlayerProfile(in);
@@ -64,6 +66,8 @@ public class GameServer implements Runnable {
 					}
 				
 				if(isUsernamePresent) {
+					System.out.println(profile.getUsername() + " - " + ip + " - username already taken. Disconnecting.");
+					
 					socket.close();
 					continue;
 				}
@@ -74,6 +78,9 @@ public class GameServer implements Runnable {
 				clients.add(client);
 				
 				client.start();
+				broadcastPacket(profile, client);
+				
+				System.out.println(profile.getUsername() + " - " + ip + " has logged in successfully!");
 			}
 			
 		} catch (IOException e) {
@@ -87,7 +94,9 @@ public class GameServer implements Runnable {
 	
 	
 	protected void broadcastPacket(Packet packet, GameServerClient sender) {
-		for(GameServerClient client : clients) {
+		for(int i = 0; i < clients.size(); i ++) {
+			GameServerClient client = clients.get(i);
+			
 			if(!client.getProfile().getUsername().equals(sender.getProfile().getUsername()))
 				client.sendPacket(packet);
 		}
@@ -96,6 +105,9 @@ public class GameServer implements Runnable {
 	
 	protected synchronized void removeDisconnectedClient(GameServerClient clientToRemove) {
 		clients.remove(clientToRemove);
+		
+		PacketPlayerDisconnect disconnectPacket = new PacketPlayerDisconnect(clientToRemove.getProfile().getUsername());
+		broadcastPacket(disconnectPacket, clientToRemove);
 	}
 	
 	

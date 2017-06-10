@@ -72,6 +72,10 @@ public abstract class Packet {
 		
 		if(packetID == PacketID.PLAYER_PROFILE.getID())
 			packet = new PacketPlayerProfile(in);
+		else if(packetID == PacketID.PLAYER_UPDATE.getID())
+			packet = new PacketPlayerUpdate(in);
+		else if(packetID == PacketID.PLAYER_DISCONNECT.getID())
+			packet = new PacketPlayerDisconnect(in);
 		
 		
 		return packet;

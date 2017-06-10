@@ -29,4 +29,27 @@ public class NumberUtils {
 	}
 	
 	
+	
+	public static float lerp(float currentValue, float goal, float speed) {
+		float finalValue = currentValue;
+		
+		
+		if(goal > currentValue) {
+			finalValue += speed;
+			
+			if(finalValue > goal)
+				finalValue = goal;
+			
+		} else if(goal < currentValue) {
+			finalValue -= speed;
+			
+			if(finalValue < goal)
+				finalValue = goal;
+		}
+		
+		
+		return finalValue;
+	}
+	
+	
 }
