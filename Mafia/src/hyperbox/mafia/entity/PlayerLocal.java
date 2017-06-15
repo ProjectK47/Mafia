@@ -1,18 +1,25 @@
 package hyperbox.mafia.entity;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 
 import com.sun.glass.events.KeyEvent;
 
 import hyperbox.mafia.animation.CoolDown;
+import hyperbox.mafia.client.GameClient;
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.input.KeyboardInput;
+import hyperbox.mafia.net.Packet;
+import hyperbox.mafia.net.PacketID;
 import hyperbox.mafia.net.PacketPlayerProfile;
+import hyperbox.mafia.net.PacketPlayerTallyUpdate;
 import hyperbox.mafia.net.PacketPlayerUpdate;
 import hyperbox.mafia.world.Tile;
 
 public class PlayerLocal extends Player {
 	
+	
+	public static final Color NAME_TAG_COLOR = new Color(128, 255, 255);
 	
 	public static final float VELOCITY_INCREASE = 1.25f;
 	public static final float VELOCITY_DECREASE = 0.7f;
@@ -27,7 +34,7 @@ public class PlayerLocal extends Player {
 	
 	
 	public PlayerLocal(float x, float y, PacketPlayerProfile profile) {
-		super(x, y, profile);
+		super(x, y, profile, NAME_TAG_COLOR);
 	}
 
 	
@@ -143,9 +150,34 @@ public class PlayerLocal extends Player {
 		
 		
 		
+		
+		
+		
+		
+		//Packet updates////
+		GameClient client = game.getGameStateManager().getGameStateInGame().getClient();
+		
+		
+		client.forEachReceivedPacket((Packet packet) -> {
+			
+			//Tally count////
+			if(packet.getID() == PacketID.PLAYER_TALLY_UPDATE) {
+				PacketPlayerTallyUpdate tallyPacket = (PacketPlayerTallyUpdate) packet;
+				
+				if(tallyPacket.getUsername().equals(profile.getUsername()))
+					tallyCount += tallyPacket.getTallyCountChange();
+				
+				
+				packet.disposePacket();
+			}
+		});
+		
+		
+		
+		
 		//Send update packet////
-		PacketPlayerUpdate updatePacket = new PacketPlayerUpdate(profile.getUsername(), x, y, animationStage, direction);
-		game.getGameStateManager().getGameStateInGame().getClient().sendPacket(updatePacket);
+		PacketPlayerUpdate updatePacket = new PacketPlayerUpdate(profile.getUsername(), x, y, animationStage, direction, aliveState, tallyCount);
+		client.sendPacket(updatePacket);
 	}
 
 	

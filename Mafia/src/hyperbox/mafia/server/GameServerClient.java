@@ -58,6 +58,8 @@ public class GameServerClient extends Thread {
 			
 			List<GameServerClient> clients = gameServer.getClients();
 			
+			out.writeInt(clients.size());
+			
 			for(GameServerClient client : clients)
 				sendPacket(client.getProfile());
 			

@@ -12,12 +12,16 @@ public class PacketPlayerUpdate extends Packet {
 	private float x;
 	private float y;
 	
-	private int animationStage;
-	private int direction;
+	private byte animationStage;
+	private byte direction;
+	
+	private byte aliveState;
+	
+	private byte tallyCount;
 	
 
 	
-	public PacketPlayerUpdate(String username, float x, float y, int animationStage, int direction) {
+	public PacketPlayerUpdate(String username, float x, float y, byte animationStage, byte direction, byte aliveState, byte tallyCount) {
 		super(PacketID.PLAYER_UPDATE);
 		
 		
@@ -28,6 +32,10 @@ public class PacketPlayerUpdate extends Packet {
 		
 		this.animationStage = animationStage;
 		this.direction = direction;
+		
+		this.aliveState = aliveState;
+		
+		this.tallyCount = tallyCount;
 	}
 	
 	
@@ -46,8 +54,12 @@ public class PacketPlayerUpdate extends Packet {
 		this.x = in.readFloat();
 		this.y = in.readFloat();
 		
-		this.animationStage = in.readInt();
-		this.direction = in.readInt();
+		this.animationStage = in.readByte();
+		this.direction = in.readByte();
+		
+		this.aliveState = in.readByte();
+		
+		this.tallyCount = in.readByte();
 	}
 
 
@@ -58,8 +70,12 @@ public class PacketPlayerUpdate extends Packet {
 		out.writeFloat(x);
 		out.writeFloat(y);
 		
-		out.writeInt(animationStage);
-		out.writeInt(direction);
+		out.writeByte(animationStage);
+		out.writeByte(direction);
+		
+		out.writeByte(aliveState);
+		
+		out.writeByte(tallyCount);
 	}
 
 	
@@ -81,12 +97,22 @@ public class PacketPlayerUpdate extends Packet {
 	}
 	
 	
-	public int getAnimationStage() {
+	public byte getAnimationStage() {
 		return animationStage;
 	}
 	
-	public int getDirection() {
+	public byte getDirection() {
 		return direction;
+	}
+	
+	
+	public byte getAliveState() {
+		return aliveState;
+	}
+	
+	
+	public byte getTallyCount() {
+		return tallyCount;
 	}
 
 }

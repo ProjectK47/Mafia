@@ -126,5 +126,9 @@ public class TextElement extends UIElement {
 		return color;
 	}
 	
+	public void setColor(Color color) {
+		this.color = color;
+	}
+	
 	
 }

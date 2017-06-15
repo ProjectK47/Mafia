@@ -47,6 +47,9 @@ public class ImageResources {
 	public static BufferedImage player1LeftWalk1;
 	public static BufferedImage player1LeftWalk2;
 	
+	public static BufferedImage notReadyIcon;
+	public static BufferedImage readyIcon;
+	
 	public static BufferedImage standardMap;
 	
 	
@@ -89,6 +92,9 @@ public class ImageResources {
 			player1LeftStill = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1LeftStill.png"));
 			player1LeftWalk1 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1LeftWalk1.png"));
 			player1LeftWalk2 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1LeftWalk2.png"));
+			
+			notReadyIcon = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "notReadyIcon.png"));
+			readyIcon = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "readyIcon.png"));
 			
 			standardMap = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "standardMap.png"));
 		} catch (IOException e) {

@@ -76,6 +76,8 @@ public abstract class Packet {
 			packet = new PacketPlayerUpdate(in);
 		else if(packetID == PacketID.PLAYER_DISCONNECT.getID())
 			packet = new PacketPlayerDisconnect(in);
+		else if(packetID == PacketID.PLAYER_TALLY_UPDATE.getID())
+			packet = new PacketPlayerTallyUpdate(in);
 		
 		
 		return packet;

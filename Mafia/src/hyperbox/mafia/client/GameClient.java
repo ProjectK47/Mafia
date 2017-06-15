@@ -28,10 +28,13 @@ public class GameClient implements Runnable {
 	private DataInputStream in;
 	private DataOutputStream out;
 	
+	private int initialPlayerCount;
+	
 	
 	private List<Packet> receivedPackets = Collections.synchronizedList(new ArrayList<Packet>());
 	
 	private boolean wasExceptionCaught = false;
+	private boolean hasReceivedBaseData = false;
 	
 	
 	
@@ -63,7 +66,11 @@ public class GameClient implements Runnable {
 			
 			playerProfile.writePacket(out);
 			
+			initialPlayerCount = in.readInt();
+			
 
+			
+			hasReceivedBaseData = true;
 			
 			while(true) {
 				byte packetID = Packet.readID(in);
@@ -153,6 +160,11 @@ public class GameClient implements Runnable {
 	}
 	
 	
+	public boolean hasReceivedBaseData() {
+		return hasReceivedBaseData;
+	}
+	
+	
 	
 	public String getIP() {
 		return ip;
@@ -161,6 +173,11 @@ public class GameClient implements Runnable {
 	
 	public int getPort() {
 		return port;
+	}
+	
+	
+	public int getInitialPlayerCount() {
+		return initialPlayerCount;
 	}
 	
 }
