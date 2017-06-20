@@ -78,6 +78,12 @@ public abstract class Packet {
 			packet = new PacketPlayerDisconnect(in);
 		else if(packetID == PacketID.PLAYER_TALLY_UPDATE.getID())
 			packet = new PacketPlayerTallyUpdate(in);
+		else if(packetID == PacketID.CHOOSE_PRIMARY.getID())
+			packet = new PacketChoosePrimary(in);
+		else if(packetID == PacketID.SPAWN_POINTER.getID())
+			packet = new PacketSpawnPointer(in);
+		else if(packetID == PacketID.CHAT_MESSAGE.getID())
+			packet = new PacketChatMessage(in);
 		
 		
 		return packet;

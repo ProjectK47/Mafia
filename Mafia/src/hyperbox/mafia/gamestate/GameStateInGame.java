@@ -12,9 +12,11 @@ import hyperbox.mafia.entity.PlayerLocal;
 import hyperbox.mafia.entity.PlayerRemote;
 import hyperbox.mafia.io.Settings;
 import hyperbox.mafia.net.Packet;
+import hyperbox.mafia.net.PacketChoosePrimary;
 import hyperbox.mafia.net.PacketID;
 import hyperbox.mafia.net.PacketPlayerDisconnect;
 import hyperbox.mafia.net.PacketPlayerProfile;
+import hyperbox.mafia.ui.ChatElement;
 import hyperbox.mafia.ui.TextElement;
 import hyperbox.mafia.ui.UIAnchor;
 
@@ -28,6 +30,8 @@ public class GameStateInGame extends GameState {
 	public static final Color STATUS_ELEMENT_COLOR_TWO = new Color(255, 243, 230);
 	public static final int STATUS_ELEMENT_COLOR_COOL_DOWN = 60;
 	
+	public static final Color STORYTELLER_NAME_TAG_COLOR = new Color(89, 0, 179);
+	
 	
 	private PacketPlayerProfile profile;
 	private PlayerLocal player;
@@ -35,11 +39,16 @@ public class GameStateInGame extends GameState {
 	
 	private TextElement statusElement;
 	private CoolDown statusElementColorCoolDown;
+	private ChatElement chatElement;
 	
 	
 	private HashMap<String, Player> players;
 	private boolean hasReceivedPlayers;
 	private boolean isLoginCheckDone;
+	
+	private String storytellerUsername;
+	private String mafiaUsername;
+	private String doctorUsername;
 	
 	
 	
@@ -59,13 +68,19 @@ public class GameStateInGame extends GameState {
 		client.startClient();
 		
 		
-		statusElement = new TextElement(0, -10, UIAnchor.CENTER, UIAnchor.POSITIVE, UIAnchor.CENTER, UIAnchor.POSITIVE, "", 30, STATUS_ELEMENT_COLOR_ONE);
+		statusElement = new TextElement(0, -10, UIAnchor.CENTER, UIAnchor.POSITIVE, UIAnchor.CENTER, UIAnchor.POSITIVE, "", 20, STATUS_ELEMENT_COLOR_ONE);
 		statusElementColorCoolDown = new CoolDown(STATUS_ELEMENT_COLOR_COOL_DOWN);
+		
+		chatElement = new ChatElement(15, -15, 20, username, game);
 		
 		
 		players = new HashMap<String, Player>();
 		hasReceivedPlayers = false;
 		isLoginCheckDone = false;
+		
+		storytellerUsername = null;
+		mafiaUsername = null;
+		doctorUsername = null;
 	}
 
 	
@@ -88,6 +103,7 @@ public class GameStateInGame extends GameState {
 		
 		if(client.isConnected()) {
 			handlePlayerPackets();
+			handlePrimaryChoosePackets();
 		}
 		
 		
@@ -101,8 +117,10 @@ public class GameStateInGame extends GameState {
 		
 		
 		
+		
 		for(String username : players.keySet())
 			players.get(username).tick(game);
+		
 		
 		
 		
@@ -114,6 +132,9 @@ public class GameStateInGame extends GameState {
 			else
 				statusElement.setColor(STATUS_ELEMENT_COLOR_ONE);
 		});
+		
+		
+		chatElement.tick(game);
 		
 		
 		////
@@ -190,7 +211,11 @@ public class GameStateInGame extends GameState {
 		game.getCamera().translateFromCamera(g);
 		
 		
+		if(player != null)
+			player.renderSleepBars(g, game);
+		
 		statusElement.render(g, game);
+		chatElement.render(g, game);
 	}
 
 	
@@ -227,9 +252,43 @@ public class GameStateInGame extends GameState {
 	
 	
 	
+	private void handlePrimaryChoosePackets() {
+		client.forEachReceivedPacket((Packet packet) -> {
+			
+			if(packet.getID() == PacketID.CHOOSE_PRIMARY) {
+				PacketChoosePrimary primaryPacket = (PacketChoosePrimary) packet;
+				
+				if(primaryPacket.getPrimaryType() == PacketChoosePrimary.PRIMARY_TYPE_STORYTELLER) {
+					changeStoryteller(primaryPacket.getUsername());
+					
+				} else if(primaryPacket.getPrimaryType() == PacketChoosePrimary.PRIMARY_TYPE_MAFIA) {
+					mafiaUsername = primaryPacket.getUsername();
+					
+				} else if(primaryPacket.getPrimaryType() == PacketChoosePrimary.PRIMARY_TYPE_DOCTOR)
+					doctorUsername = primaryPacket.getUsername();
+				
+				
+				packet.disposePacket();
+			}
+		});
+	}
+	
+	
+	
+	
+	private void changeStoryteller(String storytellerUsername) {
+		this.storytellerUsername = storytellerUsername;
+		
+		Player storyteller = players.get(storytellerUsername);
+		storyteller.setSpecialNameTagColor(STORYTELLER_NAME_TAG_COLOR);
+	}
+	
+	
+	
+	
 	
 	protected void setStatusText(String text) {
-		statusElement.setText("| " + text + " |");
+		statusElement.setText("- " + text + " -");
 	}
 	
 	
@@ -237,6 +296,62 @@ public class GameStateInGame extends GameState {
 		statusElement.setText("");
 	}
 	
+	
+	
+	
+	protected boolean isPlayerStoryteller() {
+		if(storytellerUsername != null)
+			if(player.getProfile().getUsername().equals(storytellerUsername))
+				return true;
+		
+		
+		return false;
+	}	
+	
+	protected boolean isPlayerMafia() {
+		if(mafiaUsername != null)
+			if(player.getProfile().getUsername().equals(mafiaUsername))
+				return true;
+		
+		
+		return false;
+	}
+	
+	protected boolean isPlayerDoctor() {
+		if(doctorUsername != null)
+			if(player.getProfile().getUsername().equals(doctorUsername))
+				return true;
+		
+		
+		return false;
+	}
+	
+	
+	
+	
+	protected boolean hasStorytellerBeenChosen() {
+		if(storytellerUsername != null)
+			return true;
+		
+		
+		return false;
+	}
+	
+	protected boolean hasMafiaBeenChosen() {
+		if(mafiaUsername != null)
+			return true;
+		
+		
+		return false;
+	}
+	
+	protected boolean hasDoctorBeenChosen() {
+		if(doctorUsername != null)
+			return true;
+		
+		
+		return false;
+	}
 	
 	
 	
@@ -261,5 +376,41 @@ public class GameStateInGame extends GameState {
 		return players;
 	}
 	
+	
+	
+	protected String getStorytellerUsername() {
+		return storytellerUsername;
+	}
+	
+	protected void setStorytellerUsername(String storytellerUsername, Game game) {
+		changeStoryteller(storytellerUsername);
+		
+		PacketChoosePrimary primaryPacket = new PacketChoosePrimary(storytellerUsername, PacketChoosePrimary.PRIMARY_TYPE_STORYTELLER);
+		client.sendPacket(primaryPacket);
+	}
+	
+	
+	protected String getMafiaUsername() {
+		return mafiaUsername;
+	}
+	
+	protected void setMafiaUsername(String mafiaUsername) {
+		this.mafiaUsername = mafiaUsername;
+		
+		PacketChoosePrimary primaryPacket = new PacketChoosePrimary(mafiaUsername, PacketChoosePrimary.PRIMARY_TYPE_MAFIA);
+		client.sendPacket(primaryPacket);
+	}
+	
+	
+	protected String getDoctorUsername() {
+		return doctorUsername;
+	}
+	
+	protected void setDoctorUsername(String doctorUsername) {
+		this.doctorUsername = doctorUsername;
+		
+		PacketChoosePrimary primaryPacket = new PacketChoosePrimary(doctorUsername, PacketChoosePrimary.PRIMARY_TYPE_DOCTOR);
+		client.sendPacket(primaryPacket);
+	}
 	
 }

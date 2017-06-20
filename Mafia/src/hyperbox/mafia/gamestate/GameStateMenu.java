@@ -65,8 +65,8 @@ public class GameStateMenu extends GameState {
 			writeSettings();
 			
 			if(!connectIpElement.isEmpty() && !connectPortElement.isEmpty()) {
-				game.getGameStateManager().getGameStateInGame().enable(game);
 				this.disable(game);
+				game.getGameStateManager().getGameStateInGame().enable(game);
 			}
 		});
 		

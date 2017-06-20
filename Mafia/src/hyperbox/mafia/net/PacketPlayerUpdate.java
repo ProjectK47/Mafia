@@ -17,11 +17,13 @@ public class PacketPlayerUpdate extends Packet {
 	
 	private byte aliveState;
 	
+	private boolean isSleeping;
+	
 	private byte tallyCount;
 	
 
 	
-	public PacketPlayerUpdate(String username, float x, float y, byte animationStage, byte direction, byte aliveState, byte tallyCount) {
+	public PacketPlayerUpdate(String username, float x, float y, byte animationStage, byte direction, byte aliveState, boolean isSleeping, byte tallyCount) {
 		super(PacketID.PLAYER_UPDATE);
 		
 		
@@ -34,6 +36,8 @@ public class PacketPlayerUpdate extends Packet {
 		this.direction = direction;
 		
 		this.aliveState = aliveState;
+		
+		this.isSleeping = isSleeping;
 		
 		this.tallyCount = tallyCount;
 	}
@@ -59,6 +63,8 @@ public class PacketPlayerUpdate extends Packet {
 		
 		this.aliveState = in.readByte();
 		
+		this.isSleeping = in.readBoolean();
+		
 		this.tallyCount = in.readByte();
 	}
 
@@ -74,6 +80,8 @@ public class PacketPlayerUpdate extends Packet {
 		out.writeByte(direction);
 		
 		out.writeByte(aliveState);
+		
+		out.writeBoolean(isSleeping);
 		
 		out.writeByte(tallyCount);
 	}
@@ -108,6 +116,11 @@ public class PacketPlayerUpdate extends Packet {
 	
 	public byte getAliveState() {
 		return aliveState;
+	}
+	
+	
+	public boolean isSleeping() {
+		return isSleeping;
 	}
 	
 	

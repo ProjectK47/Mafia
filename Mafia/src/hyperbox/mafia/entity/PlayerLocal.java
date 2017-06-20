@@ -9,11 +9,13 @@ import hyperbox.mafia.animation.CoolDown;
 import hyperbox.mafia.client.GameClient;
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.input.KeyboardInput;
+import hyperbox.mafia.input.MouseInput;
 import hyperbox.mafia.net.Packet;
 import hyperbox.mafia.net.PacketID;
 import hyperbox.mafia.net.PacketPlayerProfile;
 import hyperbox.mafia.net.PacketPlayerTallyUpdate;
 import hyperbox.mafia.net.PacketPlayerUpdate;
+import hyperbox.mafia.net.PacketSpawnPointer;
 import hyperbox.mafia.world.Tile;
 
 public class PlayerLocal extends Player {
@@ -25,11 +27,17 @@ public class PlayerLocal extends Player {
 	public static final float VELOCITY_DECREASE = 0.7f;
 	public static final float TERMINAL_VELOCITY = 3.5f;
 	
+	public static final float SLEEP_BARS_SPEED = 0.15f;
+	
 	
 	private float velocityX = 0;
 	private float velocityY = 0;
 	
 	private CoolDown animationCoolDown = new CoolDown(10, true);
+	
+	private float sleepBarsStage = 0f;
+	
+	private boolean isPointingEnabled = false;
 
 	
 	
@@ -43,47 +51,50 @@ public class PlayerLocal extends Player {
 	protected void onTick(Game game) {
 		
 		//Move////
-		if(KeyboardInput.isKeyDown(KeyEvent.VK_A, false)) {
-			velocityX -= VELOCITY_INCREASE;
-			
-			if(velocityX < -TERMINAL_VELOCITY)
-				velocityX = -TERMINAL_VELOCITY;
-			
-			direction = 3;
-		}
+		if(!isSleeping) {
 		
-		if(KeyboardInput.isKeyDown(KeyEvent.VK_D, false)) {
-			velocityX += VELOCITY_INCREASE;
+			if(KeyboardInput.isKeyDown(KeyEvent.VK_A, false)) {
+				velocityX -= VELOCITY_INCREASE;
+				
+				if(velocityX < -TERMINAL_VELOCITY)
+					velocityX = -TERMINAL_VELOCITY;
+				
+				direction = 3;
+			}
 			
-			if(velocityX > TERMINAL_VELOCITY)
-				velocityX = TERMINAL_VELOCITY;
+			if(KeyboardInput.isKeyDown(KeyEvent.VK_D, false)) {
+				velocityX += VELOCITY_INCREASE;
+				
+				if(velocityX > TERMINAL_VELOCITY)
+					velocityX = TERMINAL_VELOCITY;
+				
+				direction = 2;
+			}
 			
-			direction = 2;
-		}
-		
-		if(KeyboardInput.isKeyDown(KeyEvent.VK_W, false)) {
-			velocityY -= VELOCITY_INCREASE;
+			if(KeyboardInput.isKeyDown(KeyEvent.VK_W, false)) {
+				velocityY -= VELOCITY_INCREASE;
+				
+				if(velocityY < -TERMINAL_VELOCITY)
+					velocityY = -TERMINAL_VELOCITY;
+				
+				direction = 1;
+			}
 			
-			if(velocityY < -TERMINAL_VELOCITY)
-				velocityY = -TERMINAL_VELOCITY;
-			
-			direction = 1;
-		}
-		
-		if(KeyboardInput.isKeyDown(KeyEvent.VK_S, false)) {
-			velocityY += VELOCITY_INCREASE;
-			
-			if(velocityY > TERMINAL_VELOCITY)
-				velocityY = TERMINAL_VELOCITY;
-			
-			direction = 0;
+			if(KeyboardInput.isKeyDown(KeyEvent.VK_S, false)) {
+				velocityY += VELOCITY_INCREASE;
+				
+				if(velocityY > TERMINAL_VELOCITY)
+					velocityY = TERMINAL_VELOCITY;
+				
+				direction = 0;
+			}
 		}
 		
 		
 		
 		//Animation////
-		if(KeyboardInput.isKeyDown(KeyEvent.VK_W, false) || KeyboardInput.isKeyDown(KeyEvent.VK_S, false) ||
-				KeyboardInput.isKeyDown(KeyEvent.VK_A, false) || KeyboardInput.isKeyDown(KeyEvent.VK_D, false)) {
+		if((KeyboardInput.isKeyDown(KeyEvent.VK_W, false) || KeyboardInput.isKeyDown(KeyEvent.VK_S, false) ||
+				KeyboardInput.isKeyDown(KeyEvent.VK_A, false) || KeyboardInput.isKeyDown(KeyEvent.VK_D, false)) && !isSleeping) {
 			
 			animationCoolDown.tick();
 			
@@ -151,6 +162,34 @@ public class PlayerLocal extends Player {
 		
 		
 		
+		//Sleep////
+		if(KeyboardInput.wasKeyTyped(KeyEvent.VK_SPACE, false))
+			isSleeping = !isSleeping;
+		
+		
+		if(isSleeping) {
+			if(sleepBarsStage < 1)
+				sleepBarsStage += SLEEP_BARS_SPEED;
+			
+			if(sleepBarsStage > 1)
+				sleepBarsStage = 1;
+			
+		} else {
+			if(sleepBarsStage > 0)
+				sleepBarsStage -= SLEEP_BARS_SPEED;
+			
+			if(sleepBarsStage < 0)
+				sleepBarsStage = 0;
+		}
+		
+		
+		
+		//Pointer////
+		if(MouseInput.wasPrimaryClicked() && isPointingEnabled) {
+			spawnPointer(MouseInput.grabWorldMouseX(game), MouseInput.grabWorldMouseY(game), game);
+		}
+		
+		
 		
 		
 		
@@ -176,7 +215,7 @@ public class PlayerLocal extends Player {
 		
 		
 		//Send update packet////
-		PacketPlayerUpdate updatePacket = new PacketPlayerUpdate(profile.getUsername(), x, y, animationStage, direction, aliveState, tallyCount);
+		PacketPlayerUpdate updatePacket = new PacketPlayerUpdate(profile.getUsername(), x, y, animationStage, direction, aliveState, isSleeping, tallyCount);
 		client.sendPacket(updatePacket);
 	}
 
@@ -187,5 +226,40 @@ public class PlayerLocal extends Player {
 		
 	}
 
+	
+	
+	
+	
+	public void renderSleepBars(Graphics2D g, Game game) {
+		g.setColor(Color.BLACK);
+		
+		g.fillRect(-game.getWidth() / 2, -game.getHeight() / 2, game.getWidth(), (int) (game.getHeight() / 2 * sleepBarsStage));
+		g.fillRect(-game.getWidth() / 2, game.getHeight() / 2 + 1, game.getWidth(), (int) -((game.getHeight() / 2 + 1) * sleepBarsStage));
+	}
+	
+	
+	
+	
+	@Override
+	protected void spawnPointer(float targetX, float targetY, Game game) {
+		super.spawnPointer(targetX, targetY, game);
+		
+		PacketSpawnPointer pointerPacket = new PacketSpawnPointer(profile.getUsername(), targetX, targetY);
+		game.getGameStateManager().getGameStateInGame().getClient().sendPacket(pointerPacket);
+	}
+	
+	
+	
+	
+	
+	public boolean isPointingEnabled() {
+		return isPointingEnabled;
+	}
+	
+	
+	public void setIsPointingEnabled(boolean isPointingEnabled) {
+		this.isPointingEnabled = isPointingEnabled;
+	}
+	
 	
 }

@@ -42,6 +42,10 @@ public class TextBoxElement extends UIElement {
 	private TextElement boxTextElement;
 	
 	
+	private Runnable enterTask = null;
+	private boolean shouldEnterFocus = false;
+	
+	
 	private boolean isHovering = false;
 	private boolean isFocused = false;
 	
@@ -66,6 +70,17 @@ public class TextBoxElement extends UIElement {
 		boxTextElement = new TextElement(x, y, screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, boxText, size, BOX_TEXT_COLOR);
 	}
 
+	
+	public TextBoxElement(int x, int y, UIAnchor screenAnchorX, UIAnchor screenAnchorY, UIAnchor elementAnchorX, UIAnchor elementAnchorY,
+			float size, String boxText, String labelText, UIAnchor labelAnchorX, int maxBoxTextLength, String allowedChars,
+			Runnable enterTask, boolean shouldEnterFocus) {
+		
+		this(x, y, screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, size, boxText, labelText, labelAnchorX, maxBoxTextLength, allowedChars);
+		
+		this.enterTask = enterTask;
+		this.shouldEnterFocus = shouldEnterFocus;
+	}
+	
 	
 	
 	
@@ -92,26 +107,29 @@ public class TextBoxElement extends UIElement {
 		//Set focused////
 		if(MouseInput.wasPrimaryClicked()) {
 			if(isHovering) {
-				isFocused = true;
-				
-				
-				KeyboardInput.setIsPromptActive(true);
-				
-				if(boxTextElement.getText().equals(BLANK_FILLER))
-					boxTextElement.setText("");
+				addFocus();
 				
 			} else {
-				isFocused = false;
-				
-				KeyboardInput.setIsPromptActive(false);
-				markerPosition = 0;
+				removeFocus();
 			}
 		}
+		
+		
+
+		//Enter task////
+		if(KeyboardInput.wasKeyTyped(KeyEvent.VK_ENTER, true)) {
+			if(shouldEnterFocus && !isFocused)
+				addFocus();
+			else if(enterTask != null && isFocused)
+				enterTask.run();
+		}
+		
 		
 		
 		
 		if(!isFocused && boxTextElement.getText().trim().equals(""))
 			boxTextElement.setText(BLANK_FILLER);
+		
 		
 		
 		////
@@ -241,6 +259,25 @@ public class TextBoxElement extends UIElement {
 	
 	
 	
+	public void removeFocus() {
+		isFocused = false;
+		
+		KeyboardInput.setIsPromptActive(false);
+		markerPosition = 0;
+	}
+	
+	
+	private void addFocus() {
+		isFocused = true;
+		
+		KeyboardInput.setIsPromptActive(true);
+		
+		if(boxTextElement.getText().equals(BLANK_FILLER))
+			boxTextElement.setText("");
+	}
+	
+	
+	
 	public boolean isEmpty() {
 		String text = boxTextElement.getText();
 		
@@ -252,13 +289,21 @@ public class TextBoxElement extends UIElement {
 	}
 	
 	
+	public void clearText() {
+		boxTextElement.setText("");
+	}
+	
+	
+	
+	
+	
 	
 	public String getText() {
 		return boxTextElement.getText();
 	}
 	
 	
-		
+	
 	public float getSize() {
 		return size;
 	}
@@ -276,6 +321,11 @@ public class TextBoxElement extends UIElement {
 	
 	public String getAllowedChars() {
 		return allowedChars;
+	}
+	
+	
+	public boolean isFocused() {
+		return isFocused;
 	}
 
 	

@@ -5,13 +5,17 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Iterator;
 
+import hyperbox.mafia.animation.Pointer;
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.input.MouseInput;
 import hyperbox.mafia.io.AudioResources;
 import hyperbox.mafia.io.FontResources;
 import hyperbox.mafia.io.ImageResources;
 import hyperbox.mafia.net.PacketPlayerProfile;
+import hyperbox.mafia.utils.NumberUtils;
 
 public abstract class Player extends Entity {
 	
@@ -23,6 +27,11 @@ public abstract class Player extends Entity {
 	
 	public static final int READY_ICON_SIZE = 25;
 	public static final int READY_ICON_HEIGHT = 30;
+	
+	public static final float SLEEPING_ICON_SCALE = 2f;
+	public static final int SLEEPING_ICON_HEIGHT_GAP = 15;
+	public static final float SLEEPING_ICON_WAVE_SCALE = 5.5f;
+	public static final float SLEEPING_ICON_WAVE_SPEED = 6f;
 	
 	public static final float HOVER_TRANSPARENCY = 0.75f;
 	
@@ -40,10 +49,17 @@ public abstract class Player extends Entity {
 	
 	protected byte aliveState = 0;
 	
+	protected boolean isSleeping = false;
+	protected float sleepingIconWaveX = 0f;
+	
+	protected ArrayList<Pointer> pointers = new ArrayList<Pointer>();
+	
 	protected Runnable selectRunnable = null;
 	protected boolean isHovering = false;
 	
 	protected byte tallyCount = -1;
+	
+	protected Color specialNameTagColor = null;
 	
 	
 	
@@ -64,6 +80,28 @@ public abstract class Player extends Entity {
 	
 	@Override
 	public void tick(Game game) {
+		
+		//Sleeping icon////
+		sleepingIconWaveX += SLEEPING_ICON_WAVE_SPEED;
+		
+		
+		
+		//Pointers////
+		Iterator<Pointer> pointersIt = pointers.iterator();
+		
+		while(pointersIt.hasNext()) {
+			Pointer pointer = pointersIt.next();
+			
+			
+			pointer.tick(game);
+			
+			if(pointer.hasFinished())
+				pointersIt.remove();
+		}
+		
+		
+		
+		//Selection////
 		isHovering = false;
 		
 		if(selectRunnable != null) {
@@ -110,6 +148,12 @@ public abstract class Player extends Entity {
 		}
 		
 		
+		//Pointers////
+		for(Pointer pointer : pointers)
+			pointer.render(g, game);
+		
+		
+		
 		//Sprite////
 		g.drawImage(images[animationStage + (direction * 3)], (int) x - width / 2, (int) y - height, width, height, null);
 		
@@ -121,7 +165,11 @@ public abstract class Player extends Entity {
 		
 		//Name tag////
 		g.setFont(FontResources.mainFontBold.deriveFont(NAME_TAG_SIZE));
-		g.setColor(nameTagColor);
+		
+		if(specialNameTagColor == null)
+			g.setColor(nameTagColor);
+		else
+			g.setColor(specialNameTagColor);
 		
 		String username = profile.getUsername();
 		int tagWidth = g.getFontMetrics().stringWidth(username);
@@ -140,6 +188,18 @@ public abstract class Player extends Entity {
 			int tallyWidth = g.getFontMetrics().stringWidth(tally);
 			
 			g.drawString(tally, (int) x - (width / 2) - tallyWidth - TALLY_TEXT_X_SPACE, (int) y - height + TALLY_TEXT_Y_SPACE);
+		}
+		
+		
+		
+		
+		//Sleep icon////
+		if(isSleeping) {
+			BufferedImage sleepIcon = ImageResources.sleepIcon;
+			float sineWave = NumberUtils.sineWave(sleepingIconWaveX, SLEEPING_ICON_WAVE_SCALE);
+			
+			g.drawImage(sleepIcon, (int) (x - sleepIcon.getWidth() / 2 * SLEEPING_ICON_SCALE), (int) (y - height - SLEEPING_ICON_HEIGHT_GAP + sineWave),
+					(int) (sleepIcon.getWidth() * SLEEPING_ICON_SCALE), (int) (sleepIcon.getHeight() * SLEEPING_ICON_SCALE), null);
 		}
 		
 		
@@ -177,6 +237,16 @@ public abstract class Player extends Entity {
 	
 	
 	
+	
+	protected void spawnPointer(float targetX, float targetY, Game game) {
+		Pointer pointer = new Pointer(x, y - (height / 2), targetX, targetY);
+		
+		pointers.add(pointer);
+	}
+	
+	
+	
+	
 	public void enableSelection(Runnable runnable) {
 		selectRunnable = runnable;
 	}
@@ -203,6 +273,15 @@ public abstract class Player extends Entity {
 	}
 	
 	
+	public void setSpecialNameTagColor(Color specialNameTagColor) {
+		this.specialNameTagColor = specialNameTagColor;
+	}
+	
+	public void removeSpecialNameTagColor() {
+		specialNameTagColor = null;
+	}
+	
+	
 	
 	public PacketPlayerProfile getProfile() {
 		return profile;
@@ -215,6 +294,11 @@ public abstract class Player extends Entity {
 	
 	public void setAliveState(byte aliveState) {
 		this.aliveState = aliveState;
+	}
+	
+	
+	public boolean isSleeping() {
+		return isSleeping;
 	}
 	
 	

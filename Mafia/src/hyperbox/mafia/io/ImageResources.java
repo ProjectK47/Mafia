@@ -50,6 +50,8 @@ public class ImageResources {
 	public static BufferedImage notReadyIcon;
 	public static BufferedImage readyIcon;
 	
+	public static BufferedImage sleepIcon;
+	
 	public static BufferedImage standardMap;
 	
 	
@@ -95,6 +97,8 @@ public class ImageResources {
 			
 			notReadyIcon = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "notReadyIcon.png"));
 			readyIcon = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "readyIcon.png"));
+			
+			sleepIcon = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "sleepIcon.png"));
 			
 			standardMap = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "standardMap.png"));
 		} catch (IOException e) {

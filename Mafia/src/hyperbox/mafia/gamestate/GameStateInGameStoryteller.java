@@ -61,8 +61,9 @@ public class GameStateInGameStoryteller extends GameState {
 			Player player = gameStateInGame.getPlayers().get(username);
 			
 			player.disableSelection();
-			player.disableTally(game);
 		}
+		
+		gameStateInGame.getPlayer().disableTally(game);
 	}
 
 	
@@ -101,8 +102,15 @@ public class GameStateInGameStoryteller extends GameState {
 		
 		
 		
-		if(numOfVotes >= numOfPlayers) {
-			System.out.println(highestVotedPlayerUsername);
+		if(numOfVotes >= numOfPlayers)
+			if(highestVotedPlayerUsername.equals(gameStateInGame.getProfile().getUsername()))
+				gameStateInGame.setStorytellerUsername(highestVotedPlayerUsername, game);
+		
+		
+		
+		if(gameStateInGame.hasStorytellerBeenChosen()) {
+			this.disable(game);
+			game.getGameStateManager().getGameStateInGamePrimaries().enable(game);
 		}
 	}
 

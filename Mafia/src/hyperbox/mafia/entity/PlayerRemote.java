@@ -10,6 +10,7 @@ import hyperbox.mafia.net.PacketID;
 import hyperbox.mafia.net.PacketPlayerProfile;
 import hyperbox.mafia.net.PacketPlayerTallyUpdate;
 import hyperbox.mafia.net.PacketPlayerUpdate;
+import hyperbox.mafia.net.PacketSpawnPointer;
 import hyperbox.mafia.utils.NumberUtils;
 
 public class PlayerRemote extends Player {
@@ -70,12 +71,30 @@ public class PlayerRemote extends Player {
 					aliveState = updatePacket.getAliveState();
 					
 					
+					//Sleeping////
+					isSleeping = updatePacket.isSleeping();
+					
+					
 					//Tally count////
 					tallyCount = updatePacket.getTallyCount();
 					
 					
 					packet.disposePacket();
 					hasReceivedUpdate = true;
+				} 
+				
+				
+				
+			} else if(packet.getID() == PacketID.SPAWN_POINTER) {
+				//Spawn pointer////
+				
+				PacketSpawnPointer pointerPacket = (PacketSpawnPointer) packet;
+				
+				
+				if(pointerPacket.getUsername().equals(profile.getUsername())) {
+					spawnPointer(pointerPacket.getTargetX(), pointerPacket.getTargetY(), game);
+					
+					packet.disposePacket();
 				}
 			}
 		});

@@ -18,12 +18,12 @@ public class GameStateInGamePrepare extends GameState {
 	
 	
 	public GameStateInGamePrepare(Game game) {
-		readyButton = new ButtonElement(150, -70, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, 4, "Ready", () -> {
+		readyButton = new ButtonElement(-125, 60, UIAnchor.CENTER, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, 4, "Ready", () -> {
 			gameStateInGame.getPlayer().setAliveState((byte) 1);
 		});
 
 		
-		spectateButton = new ButtonElement(-150, -70, UIAnchor.POSITIVE, UIAnchor.POSITIVE, UIAnchor.POSITIVE, UIAnchor.POSITIVE, 4, "Spectate", () -> {
+		spectateButton = new ButtonElement(125, 60, UIAnchor.CENTER, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, 4, "Spectate", () -> {
 			gameStateInGame.getPlayer().setAliveState((byte) -1);
 		});
 	}
@@ -72,8 +72,8 @@ public class GameStateInGamePrepare extends GameState {
 		
 		
 		if(arePlayersReady) {
-			game.getGameStateManager().getGameStateInGameStoryteller().enable(game);
 			this.disable(game);
+			game.getGameStateManager().getGameStateInGameStoryteller().enable(game);
 		}
 	}
 	

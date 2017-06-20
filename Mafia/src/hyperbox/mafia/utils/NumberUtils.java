@@ -52,4 +52,12 @@ public class NumberUtils {
 	}
 	
 	
+	
+	public static float sineWave(float x, float scale) {
+		float sin = (float) (Math.sin(Math.toRadians(x)) * scale);
+		
+		return sin;
+	}
+	
+	
 }
