@@ -2,7 +2,9 @@ package hyperbox.mafia.gamestate;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import hyperbox.mafia.animation.CoolDown;
 import hyperbox.mafia.client.GameClient;
@@ -16,7 +18,9 @@ import hyperbox.mafia.net.PacketChoosePrimary;
 import hyperbox.mafia.net.PacketID;
 import hyperbox.mafia.net.PacketPlayerDisconnect;
 import hyperbox.mafia.net.PacketPlayerProfile;
+import hyperbox.mafia.particle.Particle;
 import hyperbox.mafia.ui.ChatElement;
+import hyperbox.mafia.ui.ChatMessage;
 import hyperbox.mafia.ui.TextElement;
 import hyperbox.mafia.ui.UIAnchor;
 
@@ -45,6 +49,8 @@ public class GameStateInGame extends GameState {
 	private HashMap<String, Player> players;
 	private boolean hasReceivedPlayers;
 	private boolean isLoginCheckDone;
+	
+	private ArrayList<Particle> particles;
 	
 	private String storytellerUsername;
 	private String mafiaUsername;
@@ -78,6 +84,8 @@ public class GameStateInGame extends GameState {
 		hasReceivedPlayers = false;
 		isLoginCheckDone = false;
 		
+		particles = new ArrayList<Particle>();
+		
 		storytellerUsername = null;
 		mafiaUsername = null;
 		doctorUsername = null;
@@ -103,7 +111,7 @@ public class GameStateInGame extends GameState {
 		
 		if(client.isConnected()) {
 			handlePlayerPackets();
-			handlePrimaryChoosePackets();
+			handlePrimaryChoosePackets(game);
 		}
 		
 		
@@ -120,6 +128,20 @@ public class GameStateInGame extends GameState {
 		
 		for(String username : players.keySet())
 			players.get(username).tick(game);
+		
+		
+		
+		Iterator<Particle> it = particles.iterator();
+		
+		while(it.hasNext()) {
+			Particle particle = it.next();
+			
+			
+			particle.tick(game);
+			
+			if(particle.isParticleDead())
+				it.remove();
+		}
 		
 		
 		
@@ -207,6 +229,10 @@ public class GameStateInGame extends GameState {
 			players.get(username).render(g, game);
 		
 		
+		for(Particle particle : particles)
+			particle.render(g, game);
+		
+		
 		game.getCamera().translateNoCameraShake(g);
 		game.getCamera().translateFromCamera(g);
 		
@@ -252,14 +278,14 @@ public class GameStateInGame extends GameState {
 	
 	
 	
-	private void handlePrimaryChoosePackets() {
+	private void handlePrimaryChoosePackets(Game game) {
 		client.forEachReceivedPacket((Packet packet) -> {
 			
 			if(packet.getID() == PacketID.CHOOSE_PRIMARY) {
 				PacketChoosePrimary primaryPacket = (PacketChoosePrimary) packet;
 				
 				if(primaryPacket.getPrimaryType() == PacketChoosePrimary.PRIMARY_TYPE_STORYTELLER) {
-					changeStoryteller(primaryPacket.getUsername());
+					changeStoryteller(primaryPacket.getUsername(), game);
 					
 				} else if(primaryPacket.getPrimaryType() == PacketChoosePrimary.PRIMARY_TYPE_MAFIA) {
 					mafiaUsername = primaryPacket.getUsername();
@@ -276,11 +302,15 @@ public class GameStateInGame extends GameState {
 	
 	
 	
-	private void changeStoryteller(String storytellerUsername) {
+	private void changeStoryteller(String storytellerUsername, Game game) {
 		this.storytellerUsername = storytellerUsername;
+		
 		
 		Player storyteller = players.get(storytellerUsername);
 		storyteller.setSpecialNameTagColor(STORYTELLER_NAME_TAG_COLOR);
+		
+		ChatMessage storytellerMessage = new ChatMessage("Game", storytellerUsername + " is the Storyteller!", true);
+		chatElement.addMessage(storytellerMessage, false, game);
 	}
 	
 	
@@ -296,6 +326,13 @@ public class GameStateInGame extends GameState {
 		statusElement.setText("");
 	}
 	
+	
+	
+	
+	
+	public void addParticle(Particle particle) {
+		particles.add(particle);
+	}
 	
 	
 	
@@ -362,7 +399,7 @@ public class GameStateInGame extends GameState {
 	}
 	
 	
-	protected PlayerLocal getPlayer() {
+	public PlayerLocal getPlayer() {
 		return player;
 	}
 	
@@ -372,7 +409,12 @@ public class GameStateInGame extends GameState {
 	}
 	
 	
-	protected HashMap<String, Player> getPlayers() {
+	public ChatElement getChatElement() {
+		return chatElement;
+	}
+	
+	
+	public HashMap<String, Player> getPlayers() {
 		return players;
 	}
 	
@@ -383,7 +425,7 @@ public class GameStateInGame extends GameState {
 	}
 	
 	protected void setStorytellerUsername(String storytellerUsername, Game game) {
-		changeStoryteller(storytellerUsername);
+		changeStoryteller(storytellerUsername, game);
 		
 		PacketChoosePrimary primaryPacket = new PacketChoosePrimary(storytellerUsername, PacketChoosePrimary.PRIMARY_TYPE_STORYTELLER);
 		client.sendPacket(primaryPacket);

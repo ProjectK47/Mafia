@@ -1,8 +1,8 @@
 package hyperbox.mafia.gamestate;
 
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.entity.Player;
@@ -14,9 +14,6 @@ public class GameStateInGameStoryteller extends GameState {
 	private GameStateInGame gameStateInGame;
 	
 	private String votedPlayerUsername = null;
-	
-	
-	private Random random = new Random();
 	
 	
 	
@@ -79,7 +76,7 @@ public class GameStateInGameStoryteller extends GameState {
 		int numOfVotes = 0;
 		
 		byte highestVotedPlayerVotes = -1;
-		String highestVotedPlayerUsername = null;
+		ArrayList<String> highestVotedPlayerUsernames = new ArrayList<String>();
 		
 		
 		for(String username : gameStateInGame.getPlayers().keySet()) {
@@ -92,19 +89,23 @@ public class GameStateInGameStoryteller extends GameState {
 			numOfPlayers ++;
 			numOfVotes += player.getTallyCount();
 			
-			if(player.getTallyCount() > highestVotedPlayerVotes ||
-					(player.getTallyCount() == highestVotedPlayerVotes && random.nextBoolean())) {
+			if(player.getTallyCount() >= highestVotedPlayerVotes) {
+				if(player.getTallyCount() > highestVotedPlayerVotes)
+					highestVotedPlayerUsernames.clear();
 				
 				highestVotedPlayerVotes = player.getTallyCount();
-				highestVotedPlayerUsername = player.getProfile().getUsername();
+				highestVotedPlayerUsernames.add(player.getProfile().getUsername());
 			}
 		}
 		
 		
 		
-		if(numOfVotes >= numOfPlayers)
-			if(highestVotedPlayerUsername.equals(gameStateInGame.getProfile().getUsername()))
-				gameStateInGame.setStorytellerUsername(highestVotedPlayerUsername, game);
+		if(numOfVotes >= numOfPlayers && highestVotedPlayerUsernames.size() == 1) {
+			String votedUsername = highestVotedPlayerUsernames.get(0);
+			
+			if(votedUsername.equals(gameStateInGame.getProfile().getUsername()))
+				gameStateInGame.setStorytellerUsername(votedUsername, game);
+		}
 		
 		
 		

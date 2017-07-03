@@ -20,6 +20,7 @@ public class PacketChatMessage extends Packet {
 	}
 	
 	
+	
 	public PacketChatMessage(DataInputStream in) throws IOException {
 		super(in, PacketID.CHAT_MESSAGE);
 	}
@@ -47,6 +48,8 @@ public class PacketChatMessage extends Packet {
 
 	
 	
+	
+
 	
 	
 	public ChatMessage getMessage() {

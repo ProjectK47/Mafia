@@ -36,7 +36,7 @@ public class GameStateInGamePrepare extends GameState {
 		gameStateInGame = game.getGameStateManager().getGameStateInGame();
 		
 		
-		gameStateInGame.setStatusText("Please Choose to Either Spectate or Be Ready");
+		gameStateInGame.setStatusText("Please choose to either Spectate or be Ready");
 	}
 
 	

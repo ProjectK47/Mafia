@@ -13,6 +13,7 @@ public class GameStateManager {
 	private GameStateInGamePrepare gameStateInGamePrepare;
 	private GameStateInGameStoryteller gameStateInGameStoryteller;
 	private GameStateInGamePrimaries gameStateInGamePrimaries;
+	private GameStateInGameElimination gameStateInGameElimination;
 	
 	
 	private LinkedList<GameState> gameStates = new LinkedList<GameState>();
@@ -26,6 +27,7 @@ public class GameStateManager {
 		gameStateInGamePrepare = new GameStateInGamePrepare(game);
 		gameStateInGameStoryteller = new GameStateInGameStoryteller();
 		gameStateInGamePrimaries = new GameStateInGamePrimaries();
+		gameStateInGameElimination = new GameStateInGameElimination();
 		
 		
 		addGameStatesToList();
@@ -63,6 +65,7 @@ public class GameStateManager {
 		gameStates.add(gameStateInGamePrepare);
 		gameStates.add(gameStateInGameStoryteller);
 		gameStates.add(gameStateInGamePrimaries);
+		gameStates.add(gameStateInGameElimination);
 	}
 	
 	
@@ -91,6 +94,11 @@ public class GameStateManager {
 	
 	public GameStateInGamePrimaries getGameStateInGamePrimaries() {
 		return gameStateInGamePrimaries;
+	}
+	
+	
+	public GameStateInGameElimination getGameStateInGameElimination() {
+		return gameStateInGameElimination;
 	}
 	
 }

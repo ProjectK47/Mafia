@@ -188,7 +188,14 @@ public class Game extends Canvas implements Runnable {
 		
 		
 		
+		camera.translateToCamera(g, this);
+		camera.translateCameraShake(g);
+		
 		map.render(g, this);
+		
+		camera.translateNoCameraShake(g);
+		camera.translateFromCamera(g);
+		
 		
 		gameStateManager.render(g, this);
 		

@@ -2,6 +2,7 @@ package hyperbox.mafia.entity;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.HashMap;
 
 import com.sun.glass.events.KeyEvent;
 
@@ -12,10 +13,12 @@ import hyperbox.mafia.input.KeyboardInput;
 import hyperbox.mafia.input.MouseInput;
 import hyperbox.mafia.net.Packet;
 import hyperbox.mafia.net.PacketID;
+import hyperbox.mafia.net.PacketPlayerExplode;
 import hyperbox.mafia.net.PacketPlayerProfile;
 import hyperbox.mafia.net.PacketPlayerTallyUpdate;
 import hyperbox.mafia.net.PacketPlayerUpdate;
 import hyperbox.mafia.net.PacketSpawnPointer;
+import hyperbox.mafia.ui.ChatMessage;
 import hyperbox.mafia.world.Tile;
 
 public class PlayerLocal extends Player {
@@ -186,7 +189,30 @@ public class PlayerLocal extends Player {
 		
 		//Pointer////
 		if(MouseInput.wasPrimaryClicked() && isPointingEnabled) {
-			spawnPointer(MouseInput.grabWorldMouseX(game), MouseInput.grabWorldMouseY(game), game);
+			int pointerTargetX = MouseInput.grabWorldMouseX(game);
+			int pointerTargetY = MouseInput.grabWorldMouseY(game);
+			
+			spawnPointer(pointerTargetX, pointerTargetY, game);
+			
+			
+			HashMap<String, Player> players = game.getGameStateManager().getGameStateInGame().getPlayers();
+			
+			for(String username : players.keySet()) {
+				Player player = players.get(username);
+				
+				
+				if(player.isPointOnPlayer(pointerTargetX, pointerTargetY) && player instanceof PlayerRemote) {
+					ChatMessage pointerMessage;
+					
+					if(!isSleeping)
+						pointerMessage = new ChatMessage("Game", "You pointed to/poked " + player.getProfile().getUsername() + "!", true);
+					else
+						pointerMessage = new ChatMessage("Game", "You pointed to/poked someone!", true);
+					
+					
+					game.getGameStateManager().getGameStateInGame().getChatElement().addMessage(pointerMessage, false, game);
+				}
+			}
 		}
 		
 		
@@ -217,6 +243,15 @@ public class PlayerLocal extends Player {
 		//Send update packet////
 		PacketPlayerUpdate updatePacket = new PacketPlayerUpdate(profile.getUsername(), x, y, animationStage, direction, aliveState, isSleeping, tallyCount);
 		client.sendPacket(updatePacket);
+		
+		
+		
+		
+		
+		
+		
+		if(KeyboardInput.wasKeyTyped(KeyEvent.VK_0, false))
+			explodeToSpectator(game);
 	}
 
 	
@@ -237,6 +272,17 @@ public class PlayerLocal extends Player {
 		g.fillRect(-game.getWidth() / 2, game.getHeight() / 2 + 1, game.getWidth(), (int) -((game.getHeight() / 2 + 1) * sleepBarsStage));
 	}
 	
+	
+	
+	
+	
+	@Override
+	public void explodeToSpectator(Game game) {
+		super.explodeToSpectator(game);
+		
+		PacketPlayerExplode explodePacket = new PacketPlayerExplode(profile.getUsername());
+		game.getGameStateManager().getGameStateInGame().getClient().sendPacket(explodePacket);
+	}
 	
 	
 	

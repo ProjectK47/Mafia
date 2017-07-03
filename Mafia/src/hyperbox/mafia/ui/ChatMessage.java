@@ -5,7 +5,6 @@ public class ChatMessage {
 	
 	private String sender;
 	private String message;
-	
 	private boolean isBold;
 	
 	
@@ -13,7 +12,6 @@ public class ChatMessage {
 	public ChatMessage(String sender, String message, boolean isBold) {
 		this.sender = sender;
 		this.message = message;
-		
 		this.isBold = isBold;
 	}
 	
@@ -27,6 +25,7 @@ public class ChatMessage {
 		return formattedMessage;
 	}
 	
+		
 	
 	
 	

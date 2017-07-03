@@ -7,10 +7,12 @@ import hyperbox.mafia.client.GameClient;
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.net.Packet;
 import hyperbox.mafia.net.PacketID;
+import hyperbox.mafia.net.PacketPlayerExplode;
 import hyperbox.mafia.net.PacketPlayerProfile;
 import hyperbox.mafia.net.PacketPlayerTallyUpdate;
 import hyperbox.mafia.net.PacketPlayerUpdate;
 import hyperbox.mafia.net.PacketSpawnPointer;
+import hyperbox.mafia.ui.ChatMessage;
 import hyperbox.mafia.utils.NumberUtils;
 
 public class PlayerRemote extends Player {
@@ -93,6 +95,36 @@ public class PlayerRemote extends Player {
 				
 				if(pointerPacket.getUsername().equals(profile.getUsername())) {
 					spawnPointer(pointerPacket.getTargetX(), pointerPacket.getTargetY(), game);
+					
+					
+					PlayerLocal localPlayer = game.getGameStateManager().getGameStateInGame().getPlayer();
+					
+					if(localPlayer.isPointOnPlayer(pointerPacket.getTargetX(), pointerPacket.getTargetY())) {
+						
+						
+						ChatMessage pointMessage;
+						
+						if(!localPlayer.isSleeping())
+							pointMessage = new ChatMessage("Game", profile.getUsername() + " has pointed to/poked you!", true);
+						else
+							pointMessage = new ChatMessage("Game", "Someone has pointed to/poked you!", true);
+						
+						game.getGameStateManager().getGameStateInGame().getChatElement().addMessage(pointMessage, false, game);
+					}
+					
+					
+					packet.disposePacket();
+				}
+				
+				
+			} else if(packet.getID() == PacketID.PLAYER_EXPLODE) {
+				//Explode////
+				
+				PacketPlayerExplode explodePacket = (PacketPlayerExplode) packet;
+				
+				
+				if(explodePacket.getUsername().equals(profile.getUsername())) {
+					explodeToSpectator(game);
 					
 					packet.disposePacket();
 				}

@@ -15,6 +15,10 @@ import hyperbox.mafia.io.AudioResources;
 import hyperbox.mafia.io.FontResources;
 import hyperbox.mafia.io.ImageResources;
 import hyperbox.mafia.net.PacketPlayerProfile;
+import hyperbox.mafia.particle.FloatRange;
+import hyperbox.mafia.particle.IntRange;
+import hyperbox.mafia.particle.ParticleSystem;
+import hyperbox.mafia.ui.ChatMessage;
 import hyperbox.mafia.utils.NumberUtils;
 
 public abstract class Player extends Entity {
@@ -39,6 +43,13 @@ public abstract class Player extends Entity {
 	public static final Color TALLY_TEXT_COLOR = new Color(255, 140, 26);
 	public static final int TALLY_TEXT_X_SPACE = 4;
 	public static final int TALLY_TEXT_Y_SPACE = 40;
+	
+	public static final ParticleSystem EXPLODE_PARTICLE_SYSTEM = new ParticleSystem(
+			new FloatRange(-1f, 1f), new FloatRange(-1f, -0.75f), 
+			new FloatRange(2f, 20f),
+			new IntRange(1, 10),
+			new IntRange(10, 30),
+			new IntRange(0, 5), new IntRange(200, 300));
 
 	
 	protected PacketPlayerProfile profile;
@@ -235,6 +246,31 @@ public abstract class Player extends Entity {
 	
 	
 	
+	
+	public boolean isPointOnPlayer(float pointX, float pointY) {
+		if(pointX >= x - (width / 2) && pointX <= x + (width / 2))
+			if(pointY >= y - height && pointY <= y)
+				return true;
+		
+		
+		return false;
+	}
+	
+	
+	
+	
+	
+	public void explodeToSpectator(Game game) {
+		aliveState = -1;
+		
+		game.getCamera().applyCameraShake(2.5f, 0.075f);
+		AudioResources.playerExplosion.playAudio();
+		EXPLODE_PARTICLE_SYSTEM.emitParticles(x, y, game,
+				new Color(240, 0, 0), new Color(255, 64, 0), new Color(255, 153, 0), new Color(89, 89, 89));
+		
+		ChatMessage deadMessage = new ChatMessage("Game", profile.getUsername() + " is now dead (a spectator)!", true);
+		game.getGameStateManager().getGameStateInGame().getChatElement().addMessage(deadMessage, false, game);
+	}
 	
 	
 	

@@ -155,12 +155,13 @@ public class ChatElement extends UIElement {
 		
 		if(messages.size() > MAX_MESSAGES)
 			messages.remove(0);
-		
+			
 		
 		if(shareMessage) {
 			PacketChatMessage messagePacket = new PacketChatMessage(message);
 			game.getGameStateManager().getGameStateInGame().getClient().sendPacket(messagePacket);
 		}
+		
 		
 		
 		resetVisibleStage();

@@ -19,7 +19,7 @@ public class GameStateInGamePrimaries extends GameState {
 		
 		
 		if(gameStateInGame.isPlayerStoryteller()) {
-			gameStateInGame.setStatusText("Tell the Others to Fall Asleep, then Choose the Mafia Once They Have Done So");
+			gameStateInGame.setStatusText("Tell the others to fall asleep so you can choose the Mafia, then choose once they have done so");
 			
 			
 			for(String username : gameStateInGame.getPlayers().keySet()) {
@@ -30,7 +30,7 @@ public class GameStateInGamePrimaries extends GameState {
 						
 						if(!gameStateInGame.hasMafiaBeenChosen()) {
 							gameStateInGame.setMafiaUsername(player.getProfile().getUsername());
-							gameStateInGame.setStatusText("Great, Now Choose the Doctor");
+							gameStateInGame.setStatusText("Great, now tell the others you're choosing the Doctor, then do so");
 							
 						} else {
 							gameStateInGame.setDoctorUsername(player.getProfile().getUsername());
@@ -40,8 +40,12 @@ public class GameStateInGamePrimaries extends GameState {
 			
 			
 		} else {
-			gameStateInGame.setStatusText("Fall Asleep and Let the Storyteller Choose the Mafia");
+			gameStateInGame.setStatusText("Fall asleep and let the Storyteller choose the Mafia and Doctor");
 		}
+		
+		
+		if(gameStateInGame.getPlayer().getAliveState() == 1)
+			gameStateInGame.getPlayer().setIsPointingEnabled(true);
 	}
 
 	
@@ -64,14 +68,10 @@ public class GameStateInGamePrimaries extends GameState {
 			return;
 		
 		
-		if(!gameStateInGame.isPlayerStoryteller() && gameStateInGame.hasMafiaBeenChosen())
-			gameStateInGame.setStatusText("Don't Awake yet, the Storyteller Is Now Choosing the Doctor");
-		
-		
-		
 		
 		if(gameStateInGame.hasDoctorBeenChosen()) {
-			System.out.println("Done!");
+			this.disable(game);
+			game.getGameStateManager().getGameStateInGameElimination().enable(game);
 		}
 	}
 
