@@ -4,16 +4,21 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import hyperbox.mafia.animation.Pointer;
 import hyperbox.mafia.core.Game;
+import hyperbox.mafia.input.KeyboardInput;
 import hyperbox.mafia.input.MouseInput;
 import hyperbox.mafia.io.AudioResources;
 import hyperbox.mafia.io.FontResources;
 import hyperbox.mafia.io.ImageResources;
+import hyperbox.mafia.net.Packet;
+import hyperbox.mafia.net.PacketID;
+import hyperbox.mafia.net.PacketPlayerStateAction;
 import hyperbox.mafia.net.PacketPlayerProfile;
 import hyperbox.mafia.particle.FloatRange;
 import hyperbox.mafia.particle.IntRange;
@@ -39,6 +44,18 @@ public abstract class Player extends Entity {
 	
 	public static final float HOVER_TRANSPARENCY = 0.75f;
 	
+	
+	public static final float STATE_ACTION_HOVER_TEXT_SIZE = 12f;
+	
+	public static final String EXPLODE_HOVER_TEXT = "Press 'X' to kill ";
+	public static final int EXPLODE_HOVER_TEXT_HEIGHT_SPACE = 10;
+	public static final Color EXPLODE_HOVER_TEXT_COLOR = new Color(255, 173, 153);
+	
+	public static final String SAVE_HOVER_TEXT = "Press 'Y' to save ";
+	public static final int SAVE_HOVER_TEXT_HEIGHT_SPACE = -10;
+	public static final Color SAVE_HOVER_TEXT_COLOR = new Color(153, 255, 204);
+	
+	
 	public static final float TALLY_TEXT_SIZE = 19f;
 	public static final Color TALLY_TEXT_COLOR = new Color(255, 140, 26);
 	public static final int TALLY_TEXT_X_SPACE = 4;
@@ -50,6 +67,13 @@ public abstract class Player extends Entity {
 			new IntRange(1, 10),
 			new IntRange(10, 30),
 			new IntRange(0, 5), new IntRange(200, 300));
+	
+	public static final ParticleSystem SAVED_PARTICLE_SYSTEM = new ParticleSystem(
+			new FloatRange(-1f, 1f), new FloatRange(-1f, 1f), 
+			new FloatRange(1f, 2f),
+			new IntRange(1, 4),
+			new IntRange(15, 60),
+			new IntRange(0, 35), new IntRange(40, 50));
 
 	
 	protected PacketPlayerProfile profile;
@@ -65,8 +89,9 @@ public abstract class Player extends Entity {
 	
 	protected ArrayList<Pointer> pointers = new ArrayList<Pointer>();
 	
-	protected Runnable selectRunnable = null;
 	protected boolean isHovering = false;
+	protected Runnable selectRunnable = null;
+	protected boolean areStateActionsAllowed = false;
 	
 	protected byte tallyCount = -1;
 	
@@ -112,26 +137,58 @@ public abstract class Player extends Entity {
 		
 		
 		
-		//Selection////
+		//Hover////
 		isHovering = false;
 		
-		if(selectRunnable != null) {
-			int mouseX = MouseInput.grabWorldMouseX(game);
-			int mouseY = MouseInput.grabWorldMouseY(game);
-			
-			if(mouseX >= x - (width / 2) && mouseX <= x + (width / 2))
-				if(mouseY >= y - height && mouseY <= y)
-					isHovering = true;
-		}
+		int mouseX = MouseInput.grabWorldMouseX(game);
+		int mouseY = MouseInput.grabWorldMouseY(game);
+		
+		if(mouseX >= x - (width / 2) && mouseX <= x + (width / 2))
+			if(mouseY >= y - height && mouseY <= y)
+				isHovering = true;
 		
 		
-		if(isHovering) {
+		
+		//Selection////
+		if(isHovering && selectRunnable != null) {
 			if(MouseInput.wasPrimaryClicked()) {
 				selectRunnable.run();
 				
 				AudioResources.selectionClick.playAudio();
 			}
 		}
+		
+		
+		
+		//State actions////
+		if(isHovering && areStateActionsAllowed) {
+			if(KeyboardInput.wasKeyTyped(KeyEvent.VK_X, false))
+				explodeToSpectator(game, true);
+			
+			
+			if(KeyboardInput.wasKeyTyped(KeyEvent.VK_Y, false))
+				showSavedSequence(game, true);
+		}
+		
+		
+		
+		game.getGameStateManager().getGameStateInGame().getClient().forEachReceivedPacket((Packet packet) -> {
+			if(packet.getID() == PacketID.PLAYER_STATE_ACTION) {
+				
+				PacketPlayerStateAction actionPacket = (PacketPlayerStateAction) packet;
+				
+				
+				if(actionPacket.getUsername().equals(profile.getUsername())) {
+					if(actionPacket.isExplodeAction())
+						explodeToSpectator(game, false);
+					else
+						showSavedSequence(game, false);
+					
+					
+					packet.disposePacket();
+				}
+			}
+		});
 		
 		
 		
@@ -143,7 +200,7 @@ public abstract class Player extends Entity {
 	public void render(Graphics2D g, Game game) {
 		Composite normalComposite = null;
 		
-		if(!isHovering) {
+		if(!isHovering || selectRunnable == null) {
 			if(aliveState == -1) {
 				AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, DEAD_TRANSPARENCY);
 				
@@ -169,7 +226,7 @@ public abstract class Player extends Entity {
 		g.drawImage(images[animationStage + (direction * 3)], (int) x - width / 2, (int) y - height, width, height, null);
 		
 		
-		if(isHovering)
+		if(isHovering && selectRunnable != null)
 			g.setComposite(normalComposite);
 		
 		
@@ -215,8 +272,32 @@ public abstract class Player extends Entity {
 		
 		
 		
+		
 		if(aliveState == -1)
 			g.setComposite(normalComposite);
+		
+		
+		
+		//State actions hover text////
+		if(isHovering && areStateActionsAllowed) {
+			g.setFont(FontResources.mainFontBold.deriveFont(STATE_ACTION_HOVER_TEXT_SIZE));
+			
+			
+			g.setColor(EXPLODE_HOVER_TEXT_COLOR);
+			
+			String explodeTextString = EXPLODE_HOVER_TEXT + profile.getUsername();
+			int explodeTextWidth = g.getFontMetrics().stringWidth(explodeTextString);
+			
+			g.drawString(explodeTextString, (int) x - explodeTextWidth / 2, (int) y - height - EXPLODE_HOVER_TEXT_HEIGHT_SPACE);
+			
+			
+			g.setColor(SAVE_HOVER_TEXT_COLOR);
+			
+			String saveTextString = SAVE_HOVER_TEXT + profile.getUsername();
+			int saveTextWidth = g.getFontMetrics().stringWidth(saveTextString);
+			
+			g.drawString(saveTextString, (int) x - saveTextWidth / 2, (int) y - height - SAVE_HOVER_TEXT_HEIGHT_SPACE);
+		}
 		
 		
 		
@@ -260,8 +341,12 @@ public abstract class Player extends Entity {
 	
 	
 	
-	public void explodeToSpectator(Game game) {
+	
+	
+	private void explodeToSpectator(Game game, boolean shouldSendPacket) {
 		aliveState = -1;
+		areStateActionsAllowed = false;
+		
 		
 		game.getCamera().applyCameraShake(2.5f, 0.075f);
 		AudioResources.playerExplosion.playAudio();
@@ -270,7 +355,32 @@ public abstract class Player extends Entity {
 		
 		ChatMessage deadMessage = new ChatMessage("Game", profile.getUsername() + " is now dead (a spectator)!", true);
 		game.getGameStateManager().getGameStateInGame().getChatElement().addMessage(deadMessage, false, game);
+		
+		
+		if(shouldSendPacket) {
+			PacketPlayerStateAction actionPacket = new PacketPlayerStateAction(profile.getUsername(), true);
+			game.getGameStateManager().getGameStateInGame().getClient().sendPacket(actionPacket);
+		}
 	}
+	
+	
+	
+	private void showSavedSequence(Game game, boolean shouldSendPacket) {
+		game.getCamera().applyCameraShake(1.2f, 0.09f);
+		AudioResources.playerSave.playAudio();
+		SAVED_PARTICLE_SYSTEM.emitParticles(x, y - (height / 2), game,
+				new Color(51, 255, 51), new Color(145, 255, 145), new Color(0, 150, 0), new Color(230, 184, 0));
+		
+		ChatMessage savedMessage = new ChatMessage("Game", profile.getUsername() + " nearly died, but was saved!", true);
+		game.getGameStateManager().getGameStateInGame().getChatElement().addMessage(savedMessage, false, game);
+		
+		
+		if(shouldSendPacket) {
+			PacketPlayerStateAction actionPacket = new PacketPlayerStateAction(profile.getUsername(), false);
+			game.getGameStateManager().getGameStateInGame().getClient().sendPacket(actionPacket);
+		}
+	}
+	
 	
 	
 	
@@ -335,6 +445,15 @@ public abstract class Player extends Entity {
 	
 	public boolean isSleeping() {
 		return isSleeping;
+	}
+	
+	
+	public boolean areStateActionsAllowed() {
+		return areStateActionsAllowed;
+	}
+	
+	public void setAreStateActionsAllowed(boolean areStateActionsAllowed) {
+		this.areStateActionsAllowed = areStateActionsAllowed;
 	}
 	
 	

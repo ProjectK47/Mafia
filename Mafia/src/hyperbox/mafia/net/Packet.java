@@ -86,8 +86,8 @@ public abstract class Packet {
 			packet = new PacketChatMessage(in);
 		else if(packetID == PacketID.ELIMINATION_CHOICE.getID())
 			packet = new PacketEliminationChoice(in);
-		else if(packetID == PacketID.PLAYER_EXPLODE.getID())
-			packet = new PacketPlayerExplode(in);
+		else if(packetID == PacketID.PLAYER_STATE_ACTION.getID())
+			packet = new PacketPlayerStateAction(in);
 		
 		
 		return packet;

@@ -12,7 +12,7 @@ public enum PacketID {
 	SPAWN_POINTER((byte) 5),
 	CHAT_MESSAGE((byte) 6),
 	ELIMINATION_CHOICE((byte) 7),
-	PLAYER_EXPLODE((byte) 8);
+	PLAYER_STATE_ACTION((byte) 8);
 	
 	
 	

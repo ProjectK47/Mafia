@@ -43,6 +43,9 @@ public class GameStateInGame extends GameState {
 	
 	private TextElement statusElement;
 	private CoolDown statusElementColorCoolDown;
+	
+	private TextElement tipElement;
+	
 	private ChatElement chatElement;
 	
 	
@@ -76,6 +79,8 @@ public class GameStateInGame extends GameState {
 		
 		statusElement = new TextElement(0, -10, UIAnchor.CENTER, UIAnchor.POSITIVE, UIAnchor.CENTER, UIAnchor.POSITIVE, "", 20, STATUS_ELEMENT_COLOR_ONE);
 		statusElementColorCoolDown = new CoolDown(STATUS_ELEMENT_COLOR_COOL_DOWN);
+		
+		tipElement = new TextElement(-20, 30, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, "", 19, new Color(255, 255, 204));
 		
 		chatElement = new ChatElement(15, -15, 20, username, game);
 		
@@ -155,6 +160,8 @@ public class GameStateInGame extends GameState {
 				statusElement.setColor(STATUS_ELEMENT_COLOR_ONE);
 		});
 		
+		
+		tipElement.tick(game);
 		
 		chatElement.tick(game);
 		
@@ -241,6 +248,7 @@ public class GameStateInGame extends GameState {
 			player.renderSleepBars(g, game);
 		
 		statusElement.render(g, game);
+		tipElement.render(g, game);
 		chatElement.render(g, game);
 	}
 
@@ -321,11 +329,18 @@ public class GameStateInGame extends GameState {
 		statusElement.setText("- " + text + " -");
 	}
 	
-	
 	protected void resetStatusText() {
 		statusElement.setText("");
 	}
 	
+	
+	protected void setTipText(String text) {
+		tipElement.setText("TIP: " + text);
+	}
+	
+	protected void resetTipText() {
+		tipElement.setText("");
+	}
 	
 	
 	

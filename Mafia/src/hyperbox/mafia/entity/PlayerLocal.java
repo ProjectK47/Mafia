@@ -13,7 +13,6 @@ import hyperbox.mafia.input.KeyboardInput;
 import hyperbox.mafia.input.MouseInput;
 import hyperbox.mafia.net.Packet;
 import hyperbox.mafia.net.PacketID;
-import hyperbox.mafia.net.PacketPlayerExplode;
 import hyperbox.mafia.net.PacketPlayerProfile;
 import hyperbox.mafia.net.PacketPlayerTallyUpdate;
 import hyperbox.mafia.net.PacketPlayerUpdate;
@@ -243,15 +242,6 @@ public class PlayerLocal extends Player {
 		//Send update packet////
 		PacketPlayerUpdate updatePacket = new PacketPlayerUpdate(profile.getUsername(), x, y, animationStage, direction, aliveState, isSleeping, tallyCount);
 		client.sendPacket(updatePacket);
-		
-		
-		
-		
-		
-		
-		
-		if(KeyboardInput.wasKeyTyped(KeyEvent.VK_0, false))
-			explodeToSpectator(game);
 	}
 
 	
@@ -273,16 +263,6 @@ public class PlayerLocal extends Player {
 	}
 	
 	
-	
-	
-	
-	@Override
-	public void explodeToSpectator(Game game) {
-		super.explodeToSpectator(game);
-		
-		PacketPlayerExplode explodePacket = new PacketPlayerExplode(profile.getUsername());
-		game.getGameStateManager().getGameStateInGame().getClient().sendPacket(explodePacket);
-	}
 	
 	
 	

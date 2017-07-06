@@ -25,16 +25,6 @@ public class GameStateInGameElimination extends GameState {
 		gameStateInGame = game.getGameStateManager().getGameStateInGame();
 		
 		
-		
-		if(gameStateInGame.isPlayerStoryteller()) {
-			gameStateInGame.setStatusText("Tell the Mafia to awaken and choose someone to kill, then go back to sleep >:D");
-			
-			
-		} else {
-			gameStateInGame.setStatusText("Follow the Storyteller's instructions. Don't wake up unless instructed to!");
-		}
-		
-		
 		resetElimination(game);
 	}
 	
@@ -79,6 +69,16 @@ public class GameStateInGameElimination extends GameState {
 		doctorChoiceUsername = null;
 		
 		
+		
+		if(gameStateInGame.isPlayerStoryteller())
+			gameStateInGame.setStatusText("Tell the Mafia to awaken and choose someone to kill, then go back to sleep >:D");	
+		else
+			gameStateInGame.setStatusText("Follow the Storyteller's instructions. Don't wake up unless instructed to!");
+		
+		
+		
+		
+		//Enable Mafia choosing////
 		if(gameStateInGame.isPlayerMafia())
 			for(String username : gameStateInGame.getPlayers().keySet()) {
 				Player player = gameStateInGame.getPlayers().get(username);
@@ -103,11 +103,11 @@ public class GameStateInGameElimination extends GameState {
 	
 	
 	
-	private void sendEliminationChoice(String username, boolean isMafiaChoice, Game game) {
-		PacketEliminationChoice choicePacket = new PacketEliminationChoice(username, isMafiaChoice);
+	private void sendEliminationChoice(String eliminatedUsername, boolean isMafiaChoice, Game game) {
+		PacketEliminationChoice choicePacket = new PacketEliminationChoice(eliminatedUsername, isMafiaChoice);
 		gameStateInGame.getClient().sendPacket(choicePacket);
 		
-		setEliminationChoice(username, isMafiaChoice, game);
+		setEliminationChoice(eliminatedUsername, isMafiaChoice, game);
 		
 		
 		for(String playerUsername : gameStateInGame.getPlayers().keySet())
@@ -116,20 +116,46 @@ public class GameStateInGameElimination extends GameState {
 	
 	
 	
-	private void setEliminationChoice(String username, boolean isMafiaChoice, Game game) {
+	private void setEliminationChoice(String eliminatedUsername, boolean isMafiaChoice, Game game) {
 		if(isMafiaChoice) {
-			mafiaChoiceUsername = username;
+			mafiaChoiceUsername = eliminatedUsername;
+			
 			
 			if(gameStateInGame.isPlayerStoryteller()) {
 				ChatMessage storytellerMessage = new ChatMessage("Game", "The Mafia (" + gameStateInGame.getMafiaUsername() +
 						") has chosen to kill " + mafiaChoiceUsername + ".", true);
 				
 				gameStateInGame.getChatElement().addMessage(storytellerMessage, false, game);
+				
+				gameStateInGame.setStatusText("Now tell the Doctor to awaken and choose someone to save, then go back to sleep.");
 			}
 			
 			
+			//Enable Doctor choosing////
+			if(gameStateInGame.isPlayerDoctor())
+				for(String username : gameStateInGame.getPlayers().keySet()) {
+					Player player = gameStateInGame.getPlayers().get(username);
+					
+					if(player instanceof PlayerRemote &&
+							!player.getProfile().getUsername().equals(gameStateInGame.getStorytellerUsername()) &&
+							player.getAliveState() == 1) {
+						
+						
+						player.enableSelection(() -> {
+							String chosenUsername = player.getProfile().getUsername();
+							
+							sendEliminationChoice(chosenUsername, false, game);
+							
+							ChatMessage doctorMessage = new ChatMessage("Game", "You chose to save " + chosenUsername + "!", true);
+							gameStateInGame.getChatElement().addMessage(doctorMessage, false, game);
+						});
+					}
+				}
+			
+			
 		} else {
-			doctorChoiceUsername = username;
+			doctorChoiceUsername = eliminatedUsername;
+			
 			
 			if(gameStateInGame.isPlayerStoryteller()) {
 				ChatMessage storytellerMessage = new ChatMessage("Game", "The Doctor (" + gameStateInGame.getDoctorUsername() +
@@ -137,6 +163,11 @@ public class GameStateInGameElimination extends GameState {
 				
 				gameStateInGame.getChatElement().addMessage(storytellerMessage, false, game);
 			}
+			
+			
+			
+			//Enable story stage////
+			gameStateInGame.setStatusText("Great, now tell everyone to awaken so you can tell your story and kill/save the chosen players.");
 		}
 	}
 	

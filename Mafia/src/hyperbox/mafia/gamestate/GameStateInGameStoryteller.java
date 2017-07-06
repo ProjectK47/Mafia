@@ -21,7 +21,7 @@ public class GameStateInGameStoryteller extends GameState {
 	protected void onEnable(Game game) {
 		gameStateInGame = game.getGameStateManager().getGameStateInGame();
 		
-		gameStateInGame.setStatusText("Please Vote on Who Should Be the Storyteller");
+		gameStateInGame.setStatusText("Please Vote on Who Should Be the Storyteller.");
 		
 		
 		

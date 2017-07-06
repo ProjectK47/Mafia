@@ -7,7 +7,6 @@ import hyperbox.mafia.client.GameClient;
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.net.Packet;
 import hyperbox.mafia.net.PacketID;
-import hyperbox.mafia.net.PacketPlayerExplode;
 import hyperbox.mafia.net.PacketPlayerProfile;
 import hyperbox.mafia.net.PacketPlayerTallyUpdate;
 import hyperbox.mafia.net.PacketPlayerUpdate;
@@ -114,21 +113,8 @@ public class PlayerRemote extends Player {
 					
 					
 					packet.disposePacket();
-				}
-				
-				
-			} else if(packet.getID() == PacketID.PLAYER_EXPLODE) {
-				//Explode////
-				
-				PacketPlayerExplode explodePacket = (PacketPlayerExplode) packet;
-				
-				
-				if(explodePacket.getUsername().equals(profile.getUsername())) {
-					explodeToSpectator(game);
-					
-					packet.disposePacket();
-				}
-			}
+				}		
+			} 
 		});
 	}
 

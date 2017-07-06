@@ -19,28 +19,34 @@ public class GameStateInGamePrimaries extends GameState {
 		
 		
 		if(gameStateInGame.isPlayerStoryteller()) {
-			gameStateInGame.setStatusText("Tell the others to fall asleep so you can choose the Mafia, then choose once they have done so");
+			gameStateInGame.setStatusText("Tell the others to fall asleep so you can choose the Mafia, then choose once they have done so.");
+			gameStateInGame.setTipText("You may kill any players that peek or point to/poke others when they shouldn't.");
 			
 			
 			for(String username : gameStateInGame.getPlayers().keySet()) {
 				Player player = gameStateInGame.getPlayers().get(username);
 				
-				if(player instanceof PlayerRemote && player.getAliveState() == 1)
+				if(player instanceof PlayerRemote && player.getAliveState() == 1) {
 					player.enableSelection(() -> {
 						
 						if(!gameStateInGame.hasMafiaBeenChosen()) {
 							gameStateInGame.setMafiaUsername(player.getProfile().getUsername());
-							gameStateInGame.setStatusText("Great, now tell the others you're choosing the Doctor, then do so");
+							gameStateInGame.setStatusText("Great, now tell the others you're choosing the Doctor, then do so.");
 							
 						} else {
 							gameStateInGame.setDoctorUsername(player.getProfile().getUsername());
 						}
 					});
+					
+					
+					player.setAreStateActionsAllowed(true);
+				}
 			}
 			
 			
 		} else {
-			gameStateInGame.setStatusText("Fall asleep and let the Storyteller choose the Mafia and Doctor");
+			gameStateInGame.setStatusText("Fall asleep and let the Storyteller choose the Mafia and Doctor.");
+			gameStateInGame.setTipText("Don't peek or point to/poke the others unless instructed to! *Cough...*");
 		}
 		
 		
