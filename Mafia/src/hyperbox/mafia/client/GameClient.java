@@ -155,6 +155,13 @@ public class GameClient implements Runnable {
 	
 	
 	
+	public void clearPackets() {
+		receivedPackets.clear();
+	}
+		
+	
+	
+	
 	public boolean wasExceptionCaught() {
 		return wasExceptionCaught;
 	}

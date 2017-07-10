@@ -57,6 +57,23 @@ public class GameStateManager {
 	}
 	
 	
+	public void disableAllStatesExcept(Game game, GameState... exceptions) {
+		for(GameState state : gameStates) {
+			boolean isException = false;
+			
+			for(GameState exception : exceptions)
+				if(state == exception) {
+					isException = true;
+					break;
+				}
+			
+			
+			if(!isException)
+				state.disable(game);
+		}
+	}
+	
+	
 	
 	
 	private void addGameStatesToList() {

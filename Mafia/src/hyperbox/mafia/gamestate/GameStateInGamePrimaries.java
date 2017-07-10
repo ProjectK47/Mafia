@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.entity.Player;
 import hyperbox.mafia.entity.PlayerRemote;
+import hyperbox.mafia.ui.ChatMessage;
 
 public class GameStateInGamePrimaries extends GameState {
 
@@ -33,8 +34,15 @@ public class GameStateInGamePrimaries extends GameState {
 							gameStateInGame.setMafiaUsername(player.getProfile().getUsername());
 							gameStateInGame.setStatusText("Great, now tell the others you're choosing the Doctor, then do so.");
 							
+							ChatMessage mafiaMessage = new ChatMessage("Game", "You chose " + player.getProfile().getUsername() + " to be the Mafia!", true);
+							gameStateInGame.getChatElement().addMessage(mafiaMessage, false, game);
+							
+							
 						} else {
 							gameStateInGame.setDoctorUsername(player.getProfile().getUsername());
+							
+							ChatMessage doctorMessage = new ChatMessage("Game", "You chose " + player.getProfile().getUsername() + " to be the Doctor!", true);
+							gameStateInGame.getChatElement().addMessage(doctorMessage, false, game);
 						}
 					});
 					

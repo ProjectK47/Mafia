@@ -1,6 +1,8 @@
 package hyperbox.mafia.ui;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 
 import hyperbox.mafia.core.Game;
@@ -14,6 +16,8 @@ public class ButtonElement extends UIElement {
 	
 	public static final Color TEXT_COLOR = new Color(255, 255, 204);
 	public static final float TEXT_BOUNDARY_BUFFER = 6f;
+	
+	public static final float DISABLED_TRANSPARENCY = 0.65f;
 	
 	
 	
@@ -32,6 +36,9 @@ public class ButtonElement extends UIElement {
 	
 	
 	protected boolean isHovering = false;
+	
+	protected boolean isHidden = false;
+	protected boolean isDisabled = false;
 	
 	
 	
@@ -59,6 +66,14 @@ public class ButtonElement extends UIElement {
 	
 	@Override
 	public void tick(Game game) {
+		if(isHidden || isDisabled) {
+			isHovering = false;
+			
+			return;
+		}
+		
+		
+		
 		int screenX = this.grabAnchoredX(game) - (width / 2);
 		int screenY = this.grabAnchoredY(game) - (height / 2);
 		
@@ -85,6 +100,10 @@ public class ButtonElement extends UIElement {
 	
 	@Override
 	public void render(Graphics2D g, Game game) {
+		if(isHidden)
+			return;
+		
+		
 		
 		if(textElement == null) {
 			float textSize = TextElement.grabMaxTextSize(text, width - (int) (TEXT_BOUNDARY_BUFFER * scale), height - (int) (TEXT_BOUNDARY_BUFFER * scale), g);
@@ -94,6 +113,17 @@ public class ButtonElement extends UIElement {
 		}
 		
 		
+		
+		
+		Composite normalComposite = null;
+		
+		
+		if(isDisabled) {
+			normalComposite = g.getComposite();
+			
+			AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, DISABLED_TRANSPARENCY);
+			g.setComposite(ac);
+		}
 		
 		
 		if(isHovering) {
@@ -109,6 +139,10 @@ public class ButtonElement extends UIElement {
 		
 		
 		textElement.render(g, game);
+		
+		
+		if(isDisabled)
+			g.setComposite(normalComposite);
 	}
 
 	
@@ -123,6 +157,24 @@ public class ButtonElement extends UIElement {
 	
 	public String getText() {
 		return text;
+	}
+	
+	
+	public boolean isHidden() {
+		return isHidden;
+	}
+	
+	public void setIsHidden(boolean isHidden) {
+		this.isHidden = isHidden;
+	}
+	
+	
+	public boolean isDisabled() {
+		return isDisabled;
+	}
+	
+	public void setIsDisabled(boolean isDisabled) {
+		this.isDisabled = isDisabled;
 	}
 	
 }

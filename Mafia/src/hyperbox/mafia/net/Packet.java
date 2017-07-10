@@ -88,6 +88,8 @@ public abstract class Packet {
 			packet = new PacketEliminationChoice(in);
 		else if(packetID == PacketID.PLAYER_STATE_ACTION.getID())
 			packet = new PacketPlayerStateAction(in);
+		else if(packetID == PacketID.ELIMINATION_ROUND_COMPLETE.getID())
+			packet = new PacketEliminationRoundComplete(in);
 		
 		
 		return packet;

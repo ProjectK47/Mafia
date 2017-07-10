@@ -82,20 +82,20 @@ public abstract class Player extends Entity {
 	protected byte animationStage = 0;
 	protected byte direction = 0;
 	
-	protected byte aliveState = 0;
+	protected byte aliveState;
 	
-	protected boolean isSleeping = false;
+	protected boolean isSleeping;
 	protected float sleepingIconWaveX = 0f;
 	
 	protected ArrayList<Pointer> pointers = new ArrayList<Pointer>();
 	
 	protected boolean isHovering = false;
-	protected Runnable selectRunnable = null;
-	protected boolean areStateActionsAllowed = false;
+	protected Runnable selectRunnable;
+	protected boolean areStateActionsAllowed;
 	
-	protected byte tallyCount = -1;
+	protected byte tallyCount;
 	
-	protected Color specialNameTagColor = null;
+	protected Color specialNameTagColor;
 	
 	
 	
@@ -109,8 +109,27 @@ public abstract class Player extends Entity {
 		
 		this.profile = profile;
 		this.nameTagColor = nameTagColor;
+		
+		
+		resetMetadata();
 	}
 
+	
+	
+	
+	public void resetMetadata() {
+		aliveState = 0;
+		
+		isSleeping = false;
+		
+		selectRunnable = null;
+		areStateActionsAllowed = false;
+		
+		tallyCount = -1;
+		
+		specialNameTagColor = null;
+	}
+	
 	
 	
 	

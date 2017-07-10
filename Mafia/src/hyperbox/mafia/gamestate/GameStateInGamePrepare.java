@@ -3,7 +3,6 @@ package hyperbox.mafia.gamestate;
 import java.awt.Graphics2D;
 
 import hyperbox.mafia.core.Game;
-import hyperbox.mafia.entity.Player;
 import hyperbox.mafia.ui.ButtonElement;
 import hyperbox.mafia.ui.UIAnchor;
 
@@ -37,6 +36,7 @@ public class GameStateInGamePrepare extends GameState {
 		
 		
 		gameStateInGame.setStatusText("Please choose to either Spectate or be Ready.");
+		gameStateInGame.setTipText("You need a minimum of " + GameStateInGame.MINIMUM_NUMBER_OF_PLAYERS + " players to start the game.");
 	}
 
 	
@@ -58,22 +58,11 @@ public class GameStateInGamePrepare extends GameState {
 		
 		
 		
-		
-		boolean arePlayersReady = true;
-		
-		for(String username : gameStateInGame.getPlayers().keySet()) {
-			Player player = gameStateInGame.getPlayers().get(username);
-			
-			if(player.getAliveState() == 0) {
-				arePlayersReady = false;
-				break;
-			}
-		}
-		
-		
-		if(arePlayersReady) {
+		if(gameStateInGame.shouldGameStart(false)) {
 			this.disable(game);
 			game.getGameStateManager().getGameStateInGameStoryteller().enable(game);
+			
+			gameStateInGame.setHasGameStarted(true);
 		}
 	}
 	

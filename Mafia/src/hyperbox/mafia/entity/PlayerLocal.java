@@ -39,14 +39,27 @@ public class PlayerLocal extends Player {
 	
 	private float sleepBarsStage = 0f;
 	
-	private boolean isPointingEnabled = false;
+	private boolean isPointingEnabled;
 
 	
 	
 	public PlayerLocal(float x, float y, PacketPlayerProfile profile) {
 		super(x, y, profile, NAME_TAG_COLOR);
+		
+		resetMetadata();
 	}
 
+	
+	
+	@Override
+	public void resetMetadata() {
+		super.resetMetadata();
+		
+		isPointingEnabled = false;
+	}
+	
+	
+	
 	
 	
 	@Override

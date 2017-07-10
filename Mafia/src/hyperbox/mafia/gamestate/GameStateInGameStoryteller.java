@@ -13,7 +13,7 @@ public class GameStateInGameStoryteller extends GameState {
 	
 	private GameStateInGame gameStateInGame;
 	
-	private String votedPlayerUsername = null;
+	private String votedPlayerUsername;
 	
 	
 	
@@ -21,7 +21,11 @@ public class GameStateInGameStoryteller extends GameState {
 	protected void onEnable(Game game) {
 		gameStateInGame = game.getGameStateManager().getGameStateInGame();
 		
+		
+		votedPlayerUsername = null;
+		
 		gameStateInGame.setStatusText("Please Vote on Who Should Be the Storyteller.");
+		gameStateInGame.resetTipText();
 		
 		
 		

@@ -27,6 +27,8 @@ import hyperbox.mafia.ui.UIAnchor;
 public class GameStateInGame extends GameState {
 
 	
+	public static final int MINIMUM_NUMBER_OF_PLAYERS = 2; //TODO change to 5.
+	
 	public static final float SPAWN_X = 0f;
 	public static final float SPAWN_Y = 0F;
 	
@@ -59,6 +61,8 @@ public class GameStateInGame extends GameState {
 	private String mafiaUsername;
 	private String doctorUsername;
 	
+	private boolean hasGameStarted;
+	
 	
 	
 	@Override
@@ -77,23 +81,11 @@ public class GameStateInGame extends GameState {
 		client.startClient();
 		
 		
-		statusElement = new TextElement(0, -10, UIAnchor.CENTER, UIAnchor.POSITIVE, UIAnchor.CENTER, UIAnchor.POSITIVE, "", 20, STATUS_ELEMENT_COLOR_ONE);
-		statusElementColorCoolDown = new CoolDown(STATUS_ELEMENT_COLOR_COOL_DOWN);
-		
-		tipElement = new TextElement(-20, 30, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, "", 19, new Color(255, 255, 204));
-		
-		chatElement = new ChatElement(15, -15, 20, username, game);
-		
-		
 		players = new HashMap<String, Player>();
 		hasReceivedPlayers = false;
-		isLoginCheckDone = false;
 		
-		particles = new ArrayList<Particle>();
 		
-		storytellerUsername = null;
-		mafiaUsername = null;
-		doctorUsername = null;
+		resetGame(game);
 	}
 
 	
@@ -106,6 +98,43 @@ public class GameStateInGame extends GameState {
 	
 	
 	
+	protected void resetGame(Game game) {
+		statusElement = new TextElement(0, -10, UIAnchor.CENTER, UIAnchor.POSITIVE, UIAnchor.CENTER, UIAnchor.POSITIVE, "", 20, STATUS_ELEMENT_COLOR_ONE);
+		statusElementColorCoolDown = new CoolDown(STATUS_ELEMENT_COLOR_COOL_DOWN);
+		
+		tipElement = new TextElement(-20, 30, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, "", 19, new Color(255, 255, 204));
+		
+		chatElement = new ChatElement(15, -15, 20, profile.getUsername(), game);
+		
+		
+		isLoginCheckDone = false;
+		
+		particles = new ArrayList<Particle>();
+		
+		storytellerUsername = null;
+		mafiaUsername = null;
+		doctorUsername = null;
+		
+		hasGameStarted = false;
+		
+		
+		
+		for(String username : players.keySet()) {
+			Player player = players.get(username);
+			
+			player.resetMetadata();
+		}
+		
+		
+		game.getGameStateManager().disableAllStatesExcept(game, this);
+		
+		
+		client.clearPackets();
+	}
+	
+	
+	
+	
 	
 	@Override
 	protected void onTick(Game game) {
@@ -115,7 +144,7 @@ public class GameStateInGame extends GameState {
 		
 		
 		if(client.isConnected()) {
-			handlePlayerPackets();
+			handlePlayerPackets(game);
 			handlePrimaryChoosePackets(game);
 		}
 		
@@ -194,27 +223,15 @@ public class GameStateInGame extends GameState {
 		
 		//All data is guaranteed to have been received from here on////
 		if(!isLoginCheckDone) {
-			boolean isPlayerNotReady = false;
-			
-			for(String username : players.keySet()) {
-				Player player = players.get(username);
-				
-				if(player instanceof PlayerLocal)
-					continue;
-				
-				
-				if(player.getAliveState() == 0) {
-					isPlayerNotReady = true;
-					break;
-				}
-			}
-			
-			
-			
-			if(isPlayerNotReady || players.size() <= 1)
+			if(!shouldGameStart(true)) {
 				game.getGameStateManager().getGameStateInGamePrepare().enable(game);
-			else
+				
+			} else {
 				player.setAliveState((byte) -1);
+				setStatusText("A game is currently in progress. You are spectating.");
+				
+				hasGameStarted = true;
+			}
 			
 			
 			isLoginCheckDone = true;
@@ -256,7 +273,7 @@ public class GameStateInGame extends GameState {
 	
 	
 	
-	private void handlePlayerPackets() {
+	private void handlePlayerPackets(Game game) {
 		client.forEachReceivedPacket((Packet packet) -> {
 			
 			if(packet.getID() == PacketID.PLAYER_PROFILE) {
@@ -271,12 +288,33 @@ public class GameStateInGame extends GameState {
 				}
 				
 				
+				ChatMessage joinMessage = new ChatMessage("Game", profilePacket.getUsername() + " has joined!", true);
+				chatElement.addMessage(joinMessage, false, game);
+				
+				
 				packet.disposePacket();
 				
 				
 			} else if(packet.getID() == PacketID.PLAYER_DISCONNECT) {
 				PacketPlayerDisconnect disconnectPacket = (PacketPlayerDisconnect) packet;
+				
+				Player disconnectedPlayer = players.get(disconnectPacket.getUsername());
+				
+				
 				players.remove(disconnectPacket.getUsername());
+				
+				ChatMessage leaveMessage = new ChatMessage("Game", disconnectPacket.getUsername() + " has left!", true);
+				chatElement.addMessage(leaveMessage, false, game);
+				
+				
+				
+				if(hasGameStarted && disconnectedPlayer.getAliveState() == 1) {
+					resetGame(game);
+					
+					ChatMessage resetMessage = new ChatMessage("Game", "Since " + disconnectPacket.getUsername() + " left, the game has been reset :(", true);
+					chatElement.addMessage(resetMessage, false, game);
+				}
+				
 				
 				packet.disposePacket();
 			}
@@ -322,6 +360,37 @@ public class GameStateInGame extends GameState {
 	}
 	
 	
+	
+	
+	protected boolean shouldGameStart(boolean shouldIgnoreLocalPlayer) {
+		boolean arePlayersReady = true;
+		int numOfReadyPlayers = 0;
+		
+		
+		for(String username : players.keySet()) {
+			Player player = players.get(username);
+			
+			if(shouldIgnoreLocalPlayer)
+				if(player instanceof PlayerLocal)
+					continue;
+			
+			
+			if(player.getAliveState() == 0) {
+				arePlayersReady = false;
+				break;
+				
+			} else if(player.getAliveState() == 1) {
+				numOfReadyPlayers ++;
+			}
+		}
+		
+		
+		if(arePlayersReady && numOfReadyPlayers >= MINIMUM_NUMBER_OF_PLAYERS)
+			return true;
+		
+		
+		return false;
+	}
 	
 	
 	
@@ -468,6 +537,16 @@ public class GameStateInGame extends GameState {
 		
 		PacketChoosePrimary primaryPacket = new PacketChoosePrimary(doctorUsername, PacketChoosePrimary.PRIMARY_TYPE_DOCTOR);
 		client.sendPacket(primaryPacket);
+	}
+	
+	
+	
+	protected boolean hasGameStarted() {
+		return hasGameStarted;
+	}
+	
+	protected void setHasGameStarted(boolean hasGameStarted) {
+		this.hasGameStarted = hasGameStarted;
 	}
 	
 }
