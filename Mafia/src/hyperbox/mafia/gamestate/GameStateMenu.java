@@ -141,6 +141,7 @@ public class GameStateMenu extends GameState {
 		
 		g.setPaint(gradientPaint);
 		g.fillRect(-game.getWidth() / 2, -game.getHeight() / 2, game.getWidth(), game.getHeight());
+		g.setPaint(null);
 		
 		
 		

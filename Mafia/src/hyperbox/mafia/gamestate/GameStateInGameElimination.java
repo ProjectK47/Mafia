@@ -2,13 +2,15 @@ package hyperbox.mafia.gamestate;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.entity.Player;
 import hyperbox.mafia.entity.PlayerRemote;
 import hyperbox.mafia.net.Packet;
 import hyperbox.mafia.net.PacketEliminationChoice;
-import hyperbox.mafia.net.PacketEliminationRoundComplete;
+import hyperbox.mafia.net.PacketEliminationNextStage;
 import hyperbox.mafia.net.PacketID;
 import hyperbox.mafia.ui.ButtonElement;
 import hyperbox.mafia.ui.ChatMessage;
@@ -21,27 +23,31 @@ public class GameStateInGameElimination extends GameState {
 	private GameStateInGame gameStateInGame;
 	
 	
-	private ButtonElement roundCompleteButton;
+	private ButtonElement nextStageButton;
 	private TextElement currentRoundElement;
 	
 	private String mafiaChoiceUsername;
 	private String doctorChoiceUsername;
 	
 	private int currentRound;
+	private boolean arePlayersVoting;
+	
+	private String votedPlayerUsername;
+	
+	
+	
+	public GameStateInGameElimination(Game game) {
+		
+		nextStageButton = new ButtonElement(15, 15, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, 4.5f, "Next Stage", () -> {
+			moveToNextStage(game, true);
+		});
+	}
 	
 	
 	
 	@Override
 	protected void onEnable(Game game) {
 		gameStateInGame = game.getGameStateManager().getGameStateInGame();
-		
-		
-		roundCompleteButton = new ButtonElement(15, 15, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, 4.5f, "Round Complete", () -> {
-			resetElimination(game);
-			
-			PacketEliminationRoundComplete roundPacket = new PacketEliminationRoundComplete();
-			gameStateInGame.getClient().sendPacket(roundPacket);
-		});
 		
 		
 		currentRoundElement = new TextElement(-20, 150, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, "", 16, new Color(255, 255, 225));
@@ -68,7 +74,7 @@ public class GameStateInGameElimination extends GameState {
 		
 		
 		
-		roundCompleteButton.tick(game);
+		nextStageButton.tick(game);
 		currentRoundElement.tick(game);
 		
 		
@@ -80,12 +86,90 @@ public class GameStateInGameElimination extends GameState {
 				packet.disposePacket();
 				
 				
-			} else if(packet.getID() == PacketID.ELIMINATION_ROUND_COMPLETE) {
-				resetElimination(game);
+			} else if(packet.getID() == PacketID.ELIMINATION_NEXT_STAGE) {
+				moveToNextStage(game, false);
 				
 				packet.disposePacket();
 			}
 		});
+		
+		
+		
+		
+		HashMap<String, Player> players = gameStateInGame.getPlayers();
+		
+		
+		
+		//Kill voted player////
+		int numOfPlayers = 0;
+		int numOfVotes = 0;
+		
+		byte highestVotedPlayerVotes = -1;
+		ArrayList<String> highestVotedPlayerUsernames = new ArrayList<String>();
+		
+		
+		for(String username : players.keySet()) {
+			Player player = players.get(username);
+			
+			if(player.getAliveState() != 1 || player.getProfile().getUsername().equals(gameStateInGame.getStorytellerUsername()))
+				continue;
+			
+			
+			numOfPlayers ++;
+			numOfVotes += player.getTallyCount();
+			
+			if(player.getTallyCount() >= highestVotedPlayerVotes) {
+				if(player.getTallyCount() > highestVotedPlayerVotes)
+					highestVotedPlayerUsernames.clear();
+				
+				highestVotedPlayerVotes = player.getTallyCount();
+				highestVotedPlayerUsernames.add(player.getProfile().getUsername());
+			}
+		}
+		
+		
+		
+		if(numOfVotes >= numOfPlayers && highestVotedPlayerUsernames.size() == 1) {
+			String votedUsername = highestVotedPlayerUsernames.get(0);
+			
+			
+			if(votedUsername.equals(gameStateInGame.getProfile().getUsername())) {
+				gameStateInGame.getPlayer().explodeToSpectator(game);
+				
+				ChatMessage outMessage = new ChatMessage("Game", votedUsername + " has been voted out!", true);
+				gameStateInGame.getChatElement().addMessage(outMessage, true, game);
+				
+				moveToNextStage(game, true);
+			}	
+		}
+		
+		
+		
+		
+		
+		//Enable End state////
+		boolean isPlayerAlive = false;
+		
+		for(String username : players.keySet()) {
+			Player player = players.get(username);
+			String playerUsername = player.getProfile().getUsername();
+			
+			
+			if(playerUsername.equals(gameStateInGame.getStorytellerUsername()) || playerUsername.equals(gameStateInGame.getMafiaUsername()))
+				continue;
+			
+			
+			if(player.getAliveState() == 1) {
+				isPlayerAlive = true;
+				break;
+			}
+		}
+		
+		
+		if(!isPlayerAlive || players.get(gameStateInGame.getMafiaUsername()).getAliveState() != 1) {
+			this.disable(game);
+			game.getGameStateManager().getGameStateInGameEnd().enable(game);
+		}
 	}
 
 	
@@ -96,7 +180,7 @@ public class GameStateInGameElimination extends GameState {
 			return;
 		
 		
-		roundCompleteButton.render(g, game);
+		nextStageButton.render(g, game);
 		currentRoundElement.render(g, game);
 	}
 	
@@ -112,15 +196,19 @@ public class GameStateInGameElimination extends GameState {
 		currentRound ++;
 		currentRoundElement.setText("Elimination Round: " + currentRound);
 		
+		arePlayersVoting = false;
+		
+		votedPlayerUsername = null;
+		
 		
 		
 		if(gameStateInGame.isPlayerStoryteller()) {
 			gameStateInGame.setStatusText("Tell the Mafia to awaken and choose someone to kill, then go back to sleep >:D");	
-			roundCompleteButton.setIsDisabled(true);
+			nextStageButton.setIsDisabled(true);
 			
 		} else {
 			gameStateInGame.setStatusText("Follow the Storyteller's instructions. Don't wake up unless instructed to!");
-			roundCompleteButton.setIsHidden(true);
+			nextStageButton.setIsHidden(true);
 		}
 		
 		
@@ -152,19 +240,85 @@ public class GameStateInGameElimination extends GameState {
 		ChatMessage roundMessage = new ChatMessage("Game", "Elimination Round #" + currentRound + " has begun.", true);
 		gameStateInGame.getChatElement().addMessage(roundMessage, false, game);
 	}
+	
+	
+	
+	
+	private void moveToNextStage(Game game, boolean shouldSendPacket) {
+		if(!arePlayersVoting) {
+			//Enable player vote stage////
+			
+			if(!gameStateInGame.isPlayerStoryteller()) {
+				if(gameStateInGame.getPlayer().getAliveState() == 1) {
+					HashMap<String, Player> players = gameStateInGame.getPlayers();
+					
+					for(String username : players.keySet()) {
+						Player player = players.get(username);
+						
+						if(player.getAliveState() != 1 || player.getProfile().getUsername().equals(gameStateInGame.getStorytellerUsername()))
+							continue;
+						
+						
+						player.enableSelection(() -> {
+							player.incrementTally(game);
+							
+							if(votedPlayerUsername != null)
+								players.get(votedPlayerUsername).decrementTally(game);
+							
+							votedPlayerUsername = player.getProfile().getUsername();
+						});
+					}
+					
+					
+					gameStateInGame.getPlayer().resetTally(game);
+				}
+				
+				
+			} else {
+				gameStateInGame.setStatusText("Tell the others to vote on who they think the Mafia is.");
+				nextStageButton.setIsDisabled(true);
+			}
+			
+			
+			arePlayersVoting = true;
+			
+			
+		} else {
+			//Start next round////
+			
+			for(String username : gameStateInGame.getPlayers().keySet()) {
+				Player player = gameStateInGame.getPlayers().get(username);
+				
+				player.disableSelection();
+			}
+			
+			gameStateInGame.getPlayer().disableTally(game);
+			
+			
+			resetElimination(game);
+		}
+		
+		
+		
+		if(shouldSendPacket) {
+			PacketEliminationNextStage stagePacket = new PacketEliminationNextStage();
+			gameStateInGame.getClient().sendPacket(stagePacket);
+		}
+	}
+	
 
 	
 	
 	
 	private void sendEliminationChoice(String eliminatedUsername, boolean isMafiaChoice, Game game) {
+		for(String playerUsername : gameStateInGame.getPlayers().keySet())
+			gameStateInGame.getPlayers().get(playerUsername).disableSelection();
+		
+		
 		PacketEliminationChoice choicePacket = new PacketEliminationChoice(eliminatedUsername, isMafiaChoice);
 		gameStateInGame.getClient().sendPacket(choicePacket);
 		
 		setEliminationChoice(eliminatedUsername, isMafiaChoice, game);
-		
-		
-		for(String playerUsername : gameStateInGame.getPlayers().keySet())
-			gameStateInGame.getPlayers().get(playerUsername).disableSelection();
 	}
 	
 	
@@ -179,30 +333,38 @@ public class GameStateInGameElimination extends GameState {
 						") has chosen to kill " + mafiaChoiceUsername + ".", true);
 				
 				gameStateInGame.getChatElement().addMessage(storytellerMessage, false, game);
-				
-				gameStateInGame.setStatusText("Now tell the Doctor to awaken and choose someone to save, then go back to sleep.");
 			}
 			
 			
-			//Enable Doctor choosing////
-			if(gameStateInGame.isPlayerDoctor())
-				for(String username : gameStateInGame.getPlayers().keySet()) {
-					Player player = gameStateInGame.getPlayers().get(username);
-					
-					if(!player.getProfile().getUsername().equals(gameStateInGame.getStorytellerUsername()) &&
-							player.getAliveState() == 1) {
+			
+			if(gameStateInGame.getPlayers().get(gameStateInGame.getDoctorUsername()).getAliveState() == 1) {
+				if(gameStateInGame.isPlayerStoryteller())
+					gameStateInGame.setStatusText("Now tell the Doctor to awaken and choose someone to save, then go back to sleep.");
+				
+				
+				//Enable Doctor choosing////
+				if(gameStateInGame.isPlayerDoctor())
+					for(String username : gameStateInGame.getPlayers().keySet()) {
+						Player player = gameStateInGame.getPlayers().get(username);
 						
-						
-						player.enableSelection(() -> {
-							String chosenUsername = player.getProfile().getUsername();
+						if(!player.getProfile().getUsername().equals(gameStateInGame.getStorytellerUsername()) &&
+								player.getAliveState() == 1) {
 							
-							sendEliminationChoice(chosenUsername, false, game);
 							
-							ChatMessage doctorMessage = new ChatMessage("Game", "You chose to save " + chosenUsername + "!", true);
-							gameStateInGame.getChatElement().addMessage(doctorMessage, false, game);
-						});
+							player.enableSelection(() -> {
+								String chosenUsername = player.getProfile().getUsername();
+								
+								sendEliminationChoice(chosenUsername, false, game);
+								
+								ChatMessage doctorMessage = new ChatMessage("Game", "You chose to save " + chosenUsername + "!", true);
+								gameStateInGame.getChatElement().addMessage(doctorMessage, false, game);
+							});
+						}
 					}
-				}
+				
+			} else {
+				enableStoryStage();
+			}
 			
 			
 		} else {
@@ -214,15 +376,29 @@ public class GameStateInGameElimination extends GameState {
 						") has chosen to save " + doctorChoiceUsername + ".", true);
 				
 				gameStateInGame.getChatElement().addMessage(storytellerMessage, false, game);
-				
-				
-				
-				//Enable story stage////
-				gameStateInGame.setStatusText("Great, now tell everyone to awaken so you can tell your story and kill/save the chosen players.");
-				roundCompleteButton.setIsDisabled(false);
 			}
+			
+			
+			//Enable story stage////
+			enableStoryStage();
 		}
 	}
 	
+	
+	
+	private void enableStoryStage() {
+		if(gameStateInGame.isPlayerStoryteller()) {
+			gameStateInGame.setStatusText("Great, now tell everyone to awaken so you can tell your story and kill/save the chosen players.");
+			nextStageButton.setIsDisabled(false);
+		}
+	}
+	
+	
+	
+	
+	
+	public int getCurrentRound() {
+		return currentRound;
+	}
 	
 }

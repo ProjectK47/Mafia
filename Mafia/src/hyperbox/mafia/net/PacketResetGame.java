@@ -4,20 +4,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class PacketEliminationRoundComplete extends Packet {
+public class PacketResetGame extends Packet {
 
 	
+	public PacketResetGame() {
+		super(PacketID.RESET_GAME);
+	}
 	
-	public PacketEliminationRoundComplete() {
-		super(PacketID.ELIMINATION_ROUND_COMPLETE);
+	
+	public PacketResetGame(DataInputStream in) throws IOException {
+		super(in, PacketID.RESET_GAME);
 	}
 
+
 	
-	public PacketEliminationRoundComplete(DataInputStream in) throws IOException {
-		super(in, PacketID.ELIMINATION_ROUND_COMPLETE);
-	}
-
-
 	
 	@Override
 	protected void readPacket(DataInputStream in) throws IOException {
@@ -29,6 +29,7 @@ public class PacketEliminationRoundComplete extends Packet {
 	protected void onWritePacket(DataOutputStream out) throws IOException {
 		
 	}
+
 	
 
 }

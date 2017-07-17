@@ -362,6 +362,11 @@ public abstract class Player extends Entity {
 	
 	
 	
+	public void explodeToSpectator(Game game) {
+		explodeToSpectator(game, true);
+	}
+	
+	
 	private void explodeToSpectator(Game game, boolean shouldSendPacket) {
 		aliveState = -1;
 		areStateActionsAllowed = false;

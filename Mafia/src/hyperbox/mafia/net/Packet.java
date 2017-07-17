@@ -88,8 +88,10 @@ public abstract class Packet {
 			packet = new PacketEliminationChoice(in);
 		else if(packetID == PacketID.PLAYER_STATE_ACTION.getID())
 			packet = new PacketPlayerStateAction(in);
-		else if(packetID == PacketID.ELIMINATION_ROUND_COMPLETE.getID())
-			packet = new PacketEliminationRoundComplete(in);
+		else if(packetID == PacketID.ELIMINATION_NEXT_STAGE.getID())
+			packet = new PacketEliminationNextStage(in);
+		else if(packetID == PacketID.RESET_GAME.getID())
+			packet = new PacketResetGame(in);
 		
 		
 		return packet;

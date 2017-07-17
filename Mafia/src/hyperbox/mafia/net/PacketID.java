@@ -13,7 +13,8 @@ public enum PacketID {
 	CHAT_MESSAGE((byte) 6),
 	ELIMINATION_CHOICE((byte) 7),
 	PLAYER_STATE_ACTION((byte) 8),
-	ELIMINATION_ROUND_COMPLETE((byte) 9);
+	ELIMINATION_NEXT_STAGE((byte) 9),
+	RESET_GAME((byte) 10);
 	
 	
 	

@@ -85,6 +85,9 @@ public class GameStateInGame extends GameState {
 		hasReceivedPlayers = false;
 		
 		
+		chatElement = new ChatElement(15, -15, 20, profile.getUsername(), game);
+		
+		
 		resetGame(game);
 	}
 
@@ -103,8 +106,6 @@ public class GameStateInGame extends GameState {
 		statusElementColorCoolDown = new CoolDown(STATUS_ELEMENT_COLOR_COOL_DOWN);
 		
 		tipElement = new TextElement(-20, 30, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, "", 19, new Color(255, 255, 204));
-		
-		chatElement = new ChatElement(15, -15, 20, profile.getUsername(), game);
 		
 		
 		isLoginCheckDone = false;
@@ -130,6 +131,11 @@ public class GameStateInGame extends GameState {
 		
 		
 		client.clearPackets();
+		doLoginCheck(game);
+		
+		
+		ChatMessage newGameMessage = new ChatMessage("Game", "A new game has begun.", true);
+		chatElement.addMessage(newGameMessage, false, game);
 	}
 	
 	
@@ -146,6 +152,7 @@ public class GameStateInGame extends GameState {
 		if(client.isConnected()) {
 			handlePlayerPackets(game);
 			handlePrimaryChoosePackets(game);
+			handleResetGamePackets(game);
 		}
 		
 		
@@ -160,8 +167,13 @@ public class GameStateInGame extends GameState {
 		
 		
 		
-		for(String username : players.keySet())
+		for(String username : players.keySet()) {
 			players.get(username).tick(game);
+			
+			//Disable selection for out players////
+			if(player.getAliveState() != 1)
+				player.disableSelection();
+		}
 		
 		
 		
@@ -195,47 +207,8 @@ public class GameStateInGame extends GameState {
 		chatElement.tick(game);
 		
 		
-		////
 		
-		
-		if(!hasReceivedPlayers) {
-			if(!client.hasReceivedBaseData() || players.size() != client.getInitialPlayerCount())
-				return;
-			
-			
-			for(String username : players.keySet()) {
-				Player player = players.get(username);
-				
-				
-				if(player instanceof PlayerRemote) {
-					PlayerRemote playerRemote = (PlayerRemote) player;
-					
-					if(!playerRemote.hasReceivedUpdate())
-						return;
-				}
-			}
-			
-			
-			hasReceivedPlayers = true;
-		}
-		
-		
-		
-		//All data is guaranteed to have been received from here on////
-		if(!isLoginCheckDone) {
-			if(!shouldGameStart(true)) {
-				game.getGameStateManager().getGameStateInGamePrepare().enable(game);
-				
-			} else {
-				player.setAliveState((byte) -1);
-				setStatusText("A game is currently in progress. You are spectating.");
-				
-				hasGameStarted = true;
-			}
-			
-			
-			isLoginCheckDone = true;
-		}
+		doLoginCheck(game);
 	}
 
 	
@@ -343,6 +316,64 @@ public class GameStateInGame extends GameState {
 				packet.disposePacket();
 			}
 		});
+	}
+	
+	
+	
+	private void handleResetGamePackets(Game game) {
+		client.forEachReceivedPacket((Packet packet) -> {
+			
+			if(packet.getID() == PacketID.RESET_GAME) {
+				resetGame(game);
+				
+				packet.disposePacket();
+			}
+		});
+	}
+	
+	
+	
+	
+	private void doLoginCheck(Game game) {
+		
+		if(!hasReceivedPlayers) {
+			if(!client.hasReceivedBaseData() || players.size() != client.getInitialPlayerCount())
+				return;
+			
+			
+			for(String username : players.keySet()) {
+				Player player = players.get(username);
+				
+				
+				if(player instanceof PlayerRemote) {
+					PlayerRemote playerRemote = (PlayerRemote) player;
+					
+					if(!playerRemote.hasReceivedUpdate())
+						return;
+				}
+			}
+			
+			
+			hasReceivedPlayers = true;
+		}
+		
+		
+		
+		//All data is guaranteed to have been received from here on////
+		if(!isLoginCheckDone) {
+			if(!shouldGameStart(true)) {
+				game.getGameStateManager().getGameStateInGamePrepare().enable(game);
+				
+			} else {
+				player.setAliveState((byte) -1);
+				setStatusText("A game is currently in progress. You are spectating.");
+				
+				hasGameStarted = true;
+			}
+			
+			
+			isLoginCheckDone = true;
+		}
 	}
 	
 	
