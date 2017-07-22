@@ -7,9 +7,10 @@ import java.awt.geom.Point2D;
 import java.io.File;
 
 import hyperbox.mafia.core.Game;
+import hyperbox.mafia.io.ImageResources;
 import hyperbox.mafia.io.Settings;
-import hyperbox.mafia.server.GameServer;
 import hyperbox.mafia.ui.ButtonElement;
+import hyperbox.mafia.ui.ImageElement;
 import hyperbox.mafia.ui.TextBoxElement;
 import hyperbox.mafia.ui.TextElement;
 import hyperbox.mafia.ui.UIAnchor;
@@ -19,6 +20,8 @@ public class GameStateMenu extends GameState {
 	
 	public static final Color BACKGROUND_COLOR_TOP = new Color(204, 255, 153, 150);
 	public static final Color BACKGROUND_COLOR_BOTTOM = new Color(255, 153, 51, 230);
+	
+	public static final String COPYRIGHT_TEXT = "Copyright © 2017 GeneralBrody8 under the GNU GPL v3.0";
 	
 	public static final String SETTINGS_FILE_PATH = "mafia-settings.xml";
 	public static final String SETTINGS_COMMENT = "This is the settings file for Mafia. It is not meant to be read/edited by humans, "
@@ -37,6 +40,9 @@ public class GameStateMenu extends GameState {
 	
 	private TextBoxElement hostPortElement;
 	private ButtonElement hostButtonElement;
+	
+	private TextElement copyrightElement;
+	private ImageElement k47LogoElement;
 	
 	private TextBoxElement usernameElement;
 	
@@ -79,11 +85,15 @@ public class GameStateMenu extends GameState {
 			writeSettings();
 			
 			if(!hostPortElement.isEmpty()) {
-				GameServer server = new GameServer(Integer.parseInt(hostPortElement.getText()));
-				server.startServer();
+				Game.startGameServer(Integer.parseInt(hostPortElement.getText()), false);
+				hostButtonElement.setIsDisabled(true);
 			}
 		});
 		
+		
+		copyrightElement = new TextElement(10, -10, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, COPYRIGHT_TEXT, 15f, Color.WHITE);
+		
+		k47LogoElement = new ImageElement(-15, -15, UIAnchor.POSITIVE, UIAnchor.POSITIVE, UIAnchor.POSITIVE, UIAnchor.POSITIVE, ImageResources.projectK47Logo, 0.05f);
 		
 		
 		usernameElement = new TextBoxElement(30, 50, UIAnchor.NEGATIVE, UIAnchor.CENTER, UIAnchor.NEGATIVE, UIAnchor.CENTER,
@@ -153,6 +163,9 @@ public class GameStateMenu extends GameState {
 		
 		hostPortElement.render(g, game);
 		hostButtonElement.render(g, game);
+		
+		copyrightElement.render(g, game);
+		k47LogoElement.render(g, game);
 		
 		usernameElement.render(g, game);
 	}

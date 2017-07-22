@@ -50,9 +50,13 @@ public class GameStateInGameElimination extends GameState {
 		gameStateInGame = game.getGameStateManager().getGameStateInGame();
 		
 		
-		currentRoundElement = new TextElement(-20, 150, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, "", 16, new Color(255, 255, 225));
+		currentRoundElement = new TextElement(-20, 125, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, "", 16, new Color(255, 255, 225));
 		
 		currentRound = 0;
+		
+		
+		if(gameStateInGame.isPlayerStoryteller())
+			gameStateInGame.getSoundEffectsElement().setIsDisabled(false);
 		
 		
 		resetElimination(game);

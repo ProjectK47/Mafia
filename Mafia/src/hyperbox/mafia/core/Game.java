@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.util.Random;
 
 import hyperbox.mafia.gamestate.GameStateManager;
 import hyperbox.mafia.input.KeyboardInput;
@@ -12,6 +14,7 @@ import hyperbox.mafia.input.MouseInput;
 import hyperbox.mafia.io.AudioResources;
 import hyperbox.mafia.io.FontResources;
 import hyperbox.mafia.io.ImageResources;
+import hyperbox.mafia.server.GameServer;
 import hyperbox.mafia.window.Camera;
 import hyperbox.mafia.window.Window;
 import hyperbox.mafia.world.Map;
@@ -49,6 +52,16 @@ public class Game extends Canvas implements Runnable {
 	
 	
 	public static void main(String[] args) {
+		if(args.length >= 2) {
+			if(args[0].equalsIgnoreCase("-server")) {
+				int port = Integer.parseInt(args[1]);
+				
+				startGameServer(port, true);
+				return;
+			}
+		}
+		
+		
 		window = new Window(WIDTH, HEIGHT, TITLE + " - " + VERSION, RESIZABLE);
 		
 		window.showWindow();
@@ -70,11 +83,29 @@ public class Game extends Canvas implements Runnable {
 		FontResources.loadResources();
 		
 		
+		Random random = new Random();
+		int randInt = random.nextInt(3);
+		
+		BufferedImage icon;
+		
+		if(randInt == 0)
+			icon = ImageResources.grassBladesStill;
+		else if(randInt == 1)
+			icon = ImageResources.grassBladesLeft;
+		else
+			icon = ImageResources.grassBladesRight;
+		
+		
+		window.setWindowIcon(icon);
+		
+		
+		
 		this.addKeyListener(new KeyboardInput());
 		
 		MouseInput mouseInput = new MouseInput();
 		this.addMouseListener(mouseInput);
 		this.addMouseMotionListener(mouseInput);
+		this.addMouseWheelListener(mouseInput);
 		
 		
 		gameStateManager = new GameStateManager(this);
@@ -224,6 +255,16 @@ public class Game extends Canvas implements Runnable {
 		return false;
 	}
 	
+	
+	
+	
+	public static void startGameServer(int port, boolean shouldJoin) {
+		GameServer server = new GameServer(port);
+		server.startServer();
+		
+		if(shouldJoin)
+			server.joinThread();
+	}
 	
 	
 	

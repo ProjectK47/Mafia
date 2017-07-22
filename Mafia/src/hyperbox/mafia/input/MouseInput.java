@@ -3,10 +3,12 @@ package hyperbox.mafia.input;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 import hyperbox.mafia.core.Game;
 
-public class MouseInput implements MouseListener, MouseMotionListener {
+public class MouseInput implements MouseListener, MouseMotionListener, MouseWheelListener {
 
 	
 	
@@ -16,6 +18,8 @@ public class MouseInput implements MouseListener, MouseMotionListener {
 	
 	private static int mouseX = 0;
 	private static int mouseY = 0;
+	
+	private static int amountScrolled = 0;
 	
 	
 	private static boolean wasPrimaryClicked = false;
@@ -90,6 +94,15 @@ public class MouseInput implements MouseListener, MouseMotionListener {
 	}
 
 	
+	
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent event) {
+		int notches = event.getWheelRotation();
+		
+		amountScrolled += notches;
+	}
+	
+	
 
 	
 	
@@ -97,6 +110,8 @@ public class MouseInput implements MouseListener, MouseMotionListener {
 		wasPrimaryClicked = false;
 		wasSecondaryClicked = false;
 		wasMiddleClicked = false;
+		
+		amountScrolled = 0;
 	}
 	
 	
@@ -157,6 +172,11 @@ public class MouseInput implements MouseListener, MouseMotionListener {
 	
 	public static float getMouseY() {
 		return mouseY;
+	}
+	
+	
+	public static int getAmountScrolled() {
+		return amountScrolled;
 	}
 	
 

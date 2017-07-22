@@ -11,8 +11,11 @@ public class GameStateInGamePrepare extends GameState {
 	
 	private GameStateInGame gameStateInGame;
 	
+	
 	private ButtonElement readyButton;
 	private ButtonElement spectateButton;
+	
+	private ButtonElement exitButton;
 	
 	
 	
@@ -24,6 +27,12 @@ public class GameStateInGamePrepare extends GameState {
 		
 		spectateButton = new ButtonElement(125, 60, UIAnchor.CENTER, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, 4, "Spectate", () -> {
 			gameStateInGame.getPlayer().setAliveState((byte) -1);
+		});
+		
+		
+		
+		exitButton = new ButtonElement(15, 15, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, 2.75f, "Exit", () -> {
+			gameStateInGame.exitToMenu(game);
 		});
 	}
 	
@@ -55,6 +64,8 @@ public class GameStateInGamePrepare extends GameState {
 		
 		readyButton.tick(game);
 		spectateButton.tick(game);
+		
+		exitButton.tick(game);
 		
 		
 		
@@ -88,6 +99,8 @@ public class GameStateInGamePrepare extends GameState {
 		
 		readyButton.render(g, game);
 		spectateButton.render(g, game);
+		
+		exitButton.render(g, game);
 	}
 
 	

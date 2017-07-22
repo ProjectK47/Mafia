@@ -92,6 +92,8 @@ public abstract class Packet {
 			packet = new PacketEliminationNextStage(in);
 		else if(packetID == PacketID.RESET_GAME.getID())
 			packet = new PacketResetGame(in);
+		else if(packetID == PacketID.SOUND_EFFECT.getID())
+			packet = new PacketSoundEffect(in);
 		
 		
 		return packet;

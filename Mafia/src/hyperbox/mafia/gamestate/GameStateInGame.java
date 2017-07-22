@@ -2,6 +2,7 @@ package hyperbox.mafia.gamestate;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,6 +13,7 @@ import hyperbox.mafia.core.Game;
 import hyperbox.mafia.entity.Player;
 import hyperbox.mafia.entity.PlayerLocal;
 import hyperbox.mafia.entity.PlayerRemote;
+import hyperbox.mafia.input.KeyboardInput;
 import hyperbox.mafia.io.Settings;
 import hyperbox.mafia.net.Packet;
 import hyperbox.mafia.net.PacketChoosePrimary;
@@ -21,6 +23,7 @@ import hyperbox.mafia.net.PacketPlayerProfile;
 import hyperbox.mafia.particle.Particle;
 import hyperbox.mafia.ui.ChatElement;
 import hyperbox.mafia.ui.ChatMessage;
+import hyperbox.mafia.ui.SoundEffectsElement;
 import hyperbox.mafia.ui.TextElement;
 import hyperbox.mafia.ui.UIAnchor;
 
@@ -49,6 +52,7 @@ public class GameStateInGame extends GameState {
 	private TextElement tipElement;
 	
 	private ChatElement chatElement;
+	private SoundEffectsElement soundEffectsElement;
 	
 	
 	private HashMap<String, Player> players;
@@ -62,6 +66,7 @@ public class GameStateInGame extends GameState {
 	private String doctorUsername;
 	
 	private boolean hasGameStarted;
+	
 	
 	
 	
@@ -106,6 +111,8 @@ public class GameStateInGame extends GameState {
 		statusElementColorCoolDown = new CoolDown(STATUS_ELEMENT_COLOR_COOL_DOWN);
 		
 		tipElement = new TextElement(-20, 30, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, "", 19, new Color(255, 255, 204));
+		
+		soundEffectsElement = new SoundEffectsElement(-20, 70, UIAnchor.POSITIVE, UIAnchor.CENTER, UIAnchor.POSITIVE, UIAnchor.CENTER, 6f, true);
 		
 		
 		isLoginCheckDone = false;
@@ -158,8 +165,7 @@ public class GameStateInGame extends GameState {
 		
 		
 		if(!client.isConnected() && client.wasExceptionCaught()) {
-			game.getGameStateManager().disableAllStates(game);
-			game.getGameStateManager().getGameStateMenu().enable(game);
+			exitToMenu(game);
 			
 			return;
 		}
@@ -202,13 +208,16 @@ public class GameStateInGame extends GameState {
 		});
 		
 		
-		tipElement.tick(game);
-		
 		chatElement.tick(game);
+		soundEffectsElement.tick(game);
 		
 		
 		
 		doLoginCheck(game);
+		
+		
+		if(KeyboardInput.isKeyDown(KeyEvent.VK_SHIFT, false) && KeyboardInput.wasKeyTyped(KeyEvent.VK_ESCAPE, false))
+			exitToMenu(game);
 	}
 
 	
@@ -237,9 +246,12 @@ public class GameStateInGame extends GameState {
 		if(player != null)
 			player.renderSleepBars(g, game);
 		
+		
 		statusElement.render(g, game);
 		tipElement.render(g, game);
+		
 		chatElement.render(g, game);
+		soundEffectsElement.render(g, game);
 	}
 
 	
@@ -425,6 +437,17 @@ public class GameStateInGame extends GameState {
 	
 	
 	
+	
+	protected void exitToMenu(Game game) {
+		game.getGameStateManager().disableAllStates(game);
+		game.getGameStateManager().getGameStateMenu().enable(game);
+		
+		client.closeClient();
+	}
+	
+	
+	
+	
 	protected void setStatusText(String text) {
 		statusElement.setText("- " + text + " -");
 	}
@@ -526,6 +549,11 @@ public class GameStateInGame extends GameState {
 	
 	public ChatElement getChatElement() {
 		return chatElement;
+	}
+	
+	
+	protected SoundEffectsElement getSoundEffectsElement() {
+		return soundEffectsElement;
 	}
 	
 	

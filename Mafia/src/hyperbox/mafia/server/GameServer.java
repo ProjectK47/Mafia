@@ -47,6 +47,8 @@ public class GameServer implements Runnable {
 			serverSocket = new ServerSocket(port);
 			
 			
+			System.out.println("Server started on port: " + port);
+			
 			while(true) {
 				Socket socket = serverSocket.accept();
 				DataInputStream in = new DataInputStream(socket.getInputStream());
@@ -141,7 +143,18 @@ public class GameServer implements Runnable {
 			client.closeConnection();
 	}
 	
+	
+	
+	public void joinThread() {
+		try {
+			serverThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
 
+	
 	
 	
 	public int getPort() {

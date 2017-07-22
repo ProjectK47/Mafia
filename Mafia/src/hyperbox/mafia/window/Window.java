@@ -1,6 +1,7 @@
 package hyperbox.mafia.window;
 
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 
@@ -44,6 +45,12 @@ public class Window {
 		frame.requestFocus();
 		
 		game.init();
+	}
+	
+	
+	
+	public void setWindowIcon(BufferedImage icon) {
+		frame.setIconImage(icon);
 	}
 	
 }

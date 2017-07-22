@@ -110,6 +110,11 @@ public class ButtonElement extends UIElement {
 			
 			textElement = new TextElement(0, 0, UIAnchor.PARENT, UIAnchor.PARENT, UIAnchor.CENTER, UIAnchor.CENTER, text, textSize, TEXT_COLOR);
 			textElement.setParent(this);
+			
+			
+			defaultImageElement.setParent(parent);
+			hoverImageElement.setParent(parent);
+			pressedImageElement.setParent(parent);
 		}
 		
 		

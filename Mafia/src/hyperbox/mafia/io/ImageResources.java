@@ -22,6 +22,9 @@ public class ImageResources {
 	public static BufferedImage textBoxLeftFocused;
 	public static BufferedImage textBoxRightFocused;
 	
+	public static BufferedImage listBox;
+	public static BufferedImage speakerIcon;
+	
 	public static BufferedImage grassTile;
 	public static BufferedImage dirtTile;
 	public static BufferedImage waterTileOne;
@@ -54,6 +57,8 @@ public class ImageResources {
 	
 	public static BufferedImage standardMap;
 	
+	public static BufferedImage projectK47Logo;
+	
 	
 	
 	
@@ -69,6 +74,9 @@ public class ImageResources {
 			textBoxRightHover = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "textBoxRightHover.png"));
 			textBoxLeftFocused = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "textBoxLeftFocused.png"));
 			textBoxRightFocused = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "textBoxRightFocused.png"));
+			
+			listBox = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "listBox.png"));
+			speakerIcon = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "speakerIcon.png"));
 			
 			grassTile = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "grassTile.png"));
 			dirtTile = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "dirtTile.png"));
@@ -101,6 +109,8 @@ public class ImageResources {
 			sleepIcon = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "sleepIcon.png"));
 			
 			standardMap = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "standardMap.png"));
+			
+			projectK47Logo = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "projectK47Logo.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);

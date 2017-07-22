@@ -8,10 +8,17 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class AudioClip {
+	
+	
+	private String filePath;
+	private float volumeAdjustment;
+	
+	private boolean shouldPreloadAudio;
 	
 	
 	private Clip clip;
@@ -19,7 +26,31 @@ public class AudioClip {
 	
 	
 	public AudioClip(String filePath, float volumeAdjustment) {
+		this.filePath = filePath;
+		this.volumeAdjustment = volumeAdjustment;
 		
+		this.shouldPreloadAudio = true;
+		
+		
+		loadClip();
+	}
+	
+	
+	public AudioClip(String filePath, float volumeAdjustment, boolean shouldPreloadAudio) {
+		this.filePath = filePath;
+		this.volumeAdjustment = volumeAdjustment;
+		
+		this.shouldPreloadAudio = shouldPreloadAudio;
+		
+		
+		if(shouldPreloadAudio)
+			loadClip();
+	}
+
+	
+	
+	
+	private void loadClip() {
 		try {
 			clip = AudioSystem.getClip();
 			
@@ -35,18 +66,49 @@ public class AudioClip {
 		} catch (LineUnavailableException | UnsupportedAudioFileException | IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
-		}	
-		
+		}
 	}
-	
-	
 
 	
 	
+	
 	public void playAudio() {
+		boolean isPlaying = false;
+		
+		if(clip != null)
+			if(clip.isActive())
+				isPlaying = true;
+		
+		
+		if(!shouldPreloadAudio && !isPlaying) {
+			loadClip();
+			
+			clip.addLineListener((LineEvent event) -> {
+				if(event.getType() == LineEvent.Type.STOP)
+					clip.close();
+			});
+		}
+		
+		
 		clip.setFramePosition(0);
 		clip.start();
 	}
+
+
 	
+	
+	public String getFilePath() {
+		return filePath;
+	}
+
+
+	public float getVolumeAdjustment() {
+		return volumeAdjustment;
+	}
+
+
+	public boolean isShouldPreloadAudio() {
+		return shouldPreloadAudio;
+	}
 	
 }
