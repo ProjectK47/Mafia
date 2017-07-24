@@ -47,7 +47,7 @@ public class ButtonElement extends UIElement {
 			float scale, String text, Runnable onPress) {
 		
 		super(x, y, (int) (ImageResources.button.getWidth() * scale), (int) (ImageResources.button.getHeight() * scale), 
-				screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY);
+				screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, true);
 		
 		
 		this.scale = scale;
@@ -65,7 +65,7 @@ public class ButtonElement extends UIElement {
 	
 	
 	@Override
-	public void tick(Game game) {
+	public void onTick(Game game) {
 		if(isHidden || isDisabled) {
 			isHovering = false;
 			
@@ -89,7 +89,7 @@ public class ButtonElement extends UIElement {
 		
 		
 		
-		if(isHovering && MouseInput.wasPrimaryClicked()) {
+		if(isHovering && MouseInput.wasPrimaryClicked(true)) {
 			onPress.run();
 			
 			AudioResources.buttonClick.playAudio();
@@ -132,7 +132,7 @@ public class ButtonElement extends UIElement {
 		
 		
 		if(isHovering) {
-			if(MouseInput.isPrimaryPressed())
+			if(MouseInput.isPrimaryPressed(true))
 				pressedImageElement.render(g, game);
 			else
 				hoverImageElement.render(g, game);
@@ -171,6 +171,11 @@ public class ButtonElement extends UIElement {
 	
 	public void setIsHidden(boolean isHidden) {
 		this.isHidden = isHidden;
+		
+		if(isHidden)
+			this.shouldAllowClickThrough = true;
+		else
+			this.shouldAllowClickThrough = false;
 	}
 	
 	

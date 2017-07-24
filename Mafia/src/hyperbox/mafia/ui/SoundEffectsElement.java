@@ -61,7 +61,6 @@ public class SoundEffectsElement extends UIElement {
 	private ButtonElement scrollUpButton;
 	
 	
-	
 	private ArrayList<SoundEffect> soundEffects = new ArrayList<SoundEffect>();
 	private int entryHeight;
 	
@@ -71,10 +70,9 @@ public class SoundEffectsElement extends UIElement {
 	
 	
 	public SoundEffectsElement(int x, int y, UIAnchor screenAnchorX, UIAnchor screenAnchorY, UIAnchor elementAnchorX, UIAnchor elementAnchorY, float scale, boolean isDisabled) {
-		super(x, y, 0, 0, screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY);
+		super(x, y, 0, 0, screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, true);
 		
 		this.scale = scale;
-		this.isDisabled = isDisabled;
 		
 		
 		boxElement = new ImageElement(x, y, screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, ImageResources.listBox, scale);
@@ -97,6 +95,9 @@ public class SoundEffectsElement extends UIElement {
 		scrollUpButton.setParent(boxElement);
 		
 		
+		setIsDisabled(isDisabled);
+		
+		
 		addSoundEffects();
 	}
 
@@ -104,7 +105,7 @@ public class SoundEffectsElement extends UIElement {
 	
 	
 	@Override
-	public void tick(Game game) {
+	public void onTick(Game game) {
 		if(width == 0 || height == 0) {
 			width = boxElement.getWidth();
 			height = boxElement.getHeight();
@@ -174,7 +175,7 @@ public class SoundEffectsElement extends UIElement {
 		
 		//Local playing////
 		if(selectedEntry != -1)
-			if(MouseInput.wasPrimaryClicked()) {
+			if(MouseInput.wasPrimaryClicked(true)) {
 				soundEffects.get(selectedEntry).getAudioClip().playAudio();
 				
 				PacketSoundEffect soundEffectPacket = new PacketSoundEffect(selectedEntry);
@@ -339,6 +340,20 @@ public class SoundEffectsElement extends UIElement {
 	
 	public void setIsDisabled(boolean isDisabled) {
 		this.isDisabled = isDisabled;
+		
+		
+		if(isDisabled) {
+			this.shouldAllowClickThrough = true;
+			
+			scrollDownButton.setIsHidden(true);
+			scrollUpButton.setIsHidden(true);
+			
+		} else {
+			this.shouldAllowClickThrough = false;
+			
+			scrollDownButton.setIsHidden(false);
+			scrollUpButton.setIsHidden(false);
+		}
 	}
 	
 }

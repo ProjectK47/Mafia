@@ -3,6 +3,7 @@ package hyperbox.mafia.ui;
 import java.awt.Graphics2D;
 
 import hyperbox.mafia.core.Game;
+import hyperbox.mafia.input.MouseInput;
 
 public abstract class UIElement {
 
@@ -22,11 +23,17 @@ public abstract class UIElement {
 	protected UIAnchor elementAnchorY;
 	
 	
+	protected boolean shouldBlockMouse;
+	
+	protected int lastTick;
+	protected boolean shouldAllowClickThrough = false;
+	
+	
 	protected UIElement parent = null;
 	
 	
 	
-	public UIElement(int x, int y, int width, int height, UIAnchor screenAnchorX, UIAnchor screenAnchorY, UIAnchor elementAnchorX, UIAnchor elementAnchorY) {
+	public UIElement(int x, int y, int width, int height, UIAnchor screenAnchorX, UIAnchor screenAnchorY, UIAnchor elementAnchorX, UIAnchor elementAnchorY, boolean shouldBlockMouse) {
 		this.x = x;
 		this.y = y;
 		
@@ -39,13 +46,49 @@ public abstract class UIElement {
 		
 		this.elementAnchorX = elementAnchorX;
 		this.elementAnchorY = elementAnchorY;
+		
+		
+		this.shouldBlockMouse = shouldBlockMouse;
 	}
 
 
 	
 	
 	
-	public abstract void tick(Game game);
+	public void tick(Game game) {
+		MouseInput.removeElementMousingOver(this);
+		
+		
+		if(shouldBlockMouse && !shouldAllowClickThrough) {
+			int mouseX = MouseInput.grabScreenMouseX(game);
+			int mouseY = MouseInput.grabScreenMouseY(game);
+			
+			int anchoredX = grabAnchoredX(game);
+			int anchoredY = grabAnchoredY(game);
+			
+			
+			boolean isMousingOver = false;
+			
+			if(mouseX >= anchoredX - (width / 2) && mouseX <= anchoredX + (width / 2))
+				if(mouseY >= anchoredY - (height / 2) && mouseY <= anchoredY + (height / 2))
+					isMousingOver = true;
+					
+			
+			if(isMousingOver)
+				MouseInput.addElementMousingOver(this);
+			else
+				MouseInput.removeElementMousingOver(this);
+		}
+		
+		
+		lastTick = game.getCurrentTick();
+		
+		
+		onTick(game);
+	}
+	
+	
+	public abstract void onTick(Game game);
 	public abstract void render(Graphics2D g, Game game);
 	
 	
@@ -130,6 +173,25 @@ public abstract class UIElement {
 
 	public UIAnchor getElementAnchorY() {
 		return elementAnchorY;
+	}
+	
+	
+	public boolean shouldBlockMouse() {
+		return shouldBlockMouse;
+	}
+	
+	
+	public int getLastTick() {
+		return lastTick;
+	}
+	
+	
+	public boolean shouldAllowClickThrough() {
+		return shouldAllowClickThrough;
+	}
+	
+	public void setShouldAllowClickThrough(boolean shouldAllowClickThrough) {
+		this.shouldAllowClickThrough = shouldAllowClickThrough;
 	}
 	
 	

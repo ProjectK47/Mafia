@@ -17,7 +17,7 @@ public class ImageElement extends UIElement {
 	public ImageElement(int x, int y, UIAnchor screenAnchorX, UIAnchor screenAnchorY, UIAnchor elementAnchorX, UIAnchor elementAnchorY,
 			BufferedImage image, float scale) {
 		
-		super(x, y, (int) (image.getWidth() * scale), (int) (image.getHeight() * scale), screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY);
+		super(x, y, (int) (image.getWidth() * scale), (int) (image.getHeight() * scale), screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, false);
 		
 		
 		this.image = image;
@@ -29,7 +29,7 @@ public class ImageElement extends UIElement {
 	
 
 	@Override
-	public void tick(Game game) {
+	public void onTick(Game game) {
 		
 	}
 

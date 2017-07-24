@@ -36,6 +36,11 @@ public class Game extends Canvas implements Runnable {
 	
 	private static final long serialVersionUID = 3805123262062170593L;
 
+	
+	////
+	
+	private int currentTick = 0;
+	
 	////
 	
 	private static Window window;
@@ -47,7 +52,6 @@ public class Game extends Canvas implements Runnable {
 	private Camera camera;
 	
 	private Map map;
-	
 	
 	
 	
@@ -187,7 +191,10 @@ public class Game extends Canvas implements Runnable {
 		
 		
 		KeyboardInput.tick();
-		MouseInput.tick();
+		MouseInput.tick(this);
+		
+		
+		currentTick ++;
 	}
 	
 	
@@ -267,6 +274,12 @@ public class Game extends Canvas implements Runnable {
 	}
 	
 	
+	
+	
+	
+	public int getCurrentTick() {
+		return currentTick;
+	}
 	
 	
 	

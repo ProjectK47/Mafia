@@ -1,12 +1,15 @@
 package hyperbox.mafia.entity;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.util.HashMap;
 
 import com.sun.glass.events.KeyEvent;
 
 import hyperbox.mafia.animation.CoolDown;
+import hyperbox.mafia.animation.Pointer;
 import hyperbox.mafia.client.GameClient;
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.input.KeyboardInput;
@@ -18,6 +21,7 @@ import hyperbox.mafia.net.PacketPlayerTallyUpdate;
 import hyperbox.mafia.net.PacketPlayerUpdate;
 import hyperbox.mafia.net.PacketSpawnPointer;
 import hyperbox.mafia.ui.ChatMessage;
+import hyperbox.mafia.utils.NumberUtils;
 import hyperbox.mafia.world.Tile;
 
 public class PlayerLocal extends Player {
@@ -31,6 +35,9 @@ public class PlayerLocal extends Player {
 	
 	public static final float SLEEP_BARS_SPEED = 0.15f;
 	
+	public static final float POINTER_SECONDARY_OUTLINE_WIDTH = 2f;
+	public static final float POINTER_SECONDARY_OUTLINE_STAGE_DECREASE = 0.035f;
+	
 	
 	private float velocityX = 0;
 	private float velocityY = 0;
@@ -38,8 +45,11 @@ public class PlayerLocal extends Player {
 	private CoolDown animationCoolDown = new CoolDown(10, true);
 	
 	private float sleepBarsStage = 0f;
+	private boolean isSleepingAllowed;
 	
 	private boolean isPointingEnabled;
+	
+	private float pointerOutlineStage = 0f;
 
 	
 	
@@ -55,7 +65,8 @@ public class PlayerLocal extends Player {
 	public void resetMetadata() {
 		super.resetMetadata();
 		
-		isPointingEnabled = false;
+		isSleepingAllowed = false;
+		isPointingEnabled = true; //TODO change
 	}
 	
 	
@@ -178,7 +189,7 @@ public class PlayerLocal extends Player {
 		
 		
 		//Sleep////
-		if(KeyboardInput.wasKeyTyped(KeyEvent.VK_SPACE, false))
+		if(KeyboardInput.wasKeyTyped(KeyEvent.VK_SPACE, false) && isSleepingAllowed)
 			isSleeping = !isSleeping;
 		
 		
@@ -200,31 +211,55 @@ public class PlayerLocal extends Player {
 		
 		
 		//Pointer////
-		if(MouseInput.wasPrimaryClicked() && isPointingEnabled) {
+		if(isPointingEnabled) {
 			int pointerTargetX = MouseInput.grabWorldMouseX(game);
 			int pointerTargetY = MouseInput.grabWorldMouseY(game);
 			
-			spawnPointer(pointerTargetX, pointerTargetY, game);
 			
-			
-			HashMap<String, Player> players = game.getGameStateManager().getGameStateInGame().getPlayers();
-			
-			for(String username : players.keySet()) {
-				Player player = players.get(username);
-				
-				
-				if(player.isPointOnPlayer(pointerTargetX, pointerTargetY) && player instanceof PlayerRemote) {
-					ChatMessage pointerMessage;
-					
-					if(!isSleeping)
-						pointerMessage = new ChatMessage("Game", "You pointed to/poked " + player.getProfile().getUsername() + "!", true);
-					else
-						pointerMessage = new ChatMessage("Game", "You pointed to/poked someone!", true);
-					
-					
-					game.getGameStateManager().getGameStateInGame().getChatElement().addMessage(pointerMessage, false, game);
-				}
+			if(MouseInput.wasPrimaryClicked(false)) {
+				spawnPointer(pointerTargetX, pointerTargetY, true, game);
 			}
+			
+			
+			if(MouseInput.wasSecondaryClicked(false)) {
+				float targetDistance = NumberUtils.distance(x, y - (height / 2), pointerTargetX, pointerTargetY);
+				
+				if(targetDistance <= Player.SELECT_POINTER_SECONDARY_DISTANCE_LIMIT) {
+					spawnPointer(pointerTargetX, pointerTargetY, false, game);
+					
+					
+					HashMap<String, Player> players = game.getGameStateManager().getGameStateInGame().getPlayers();
+					
+					for(String username : players.keySet()) {
+						Player player = players.get(username);
+						
+						
+						if(player.isPointOnPlayer(pointerTargetX, pointerTargetY) && player instanceof PlayerRemote) {
+							ChatMessage pointerMessage;
+							
+							if(!isSleeping)
+								pointerMessage = new ChatMessage("Game", "You poked " + player.getProfile().getUsername() + "!", true);
+							else
+								pointerMessage = new ChatMessage("Game", "You poked someone!", true);
+							
+							
+							game.getGameStateManager().getGameStateInGame().getChatElement().addMessage(pointerMessage, false, game);
+						}
+					}
+					
+				} else
+					pointerOutlineStage = 1f;
+			}
+		}
+		
+		
+		
+		//Pointer outline////
+		if(pointerOutlineStage > 0) {
+			pointerOutlineStage -= POINTER_SECONDARY_OUTLINE_STAGE_DECREASE;
+			
+			if(pointerOutlineStage < 0)
+				pointerOutlineStage = 0;
 		}
 		
 		
@@ -261,7 +296,21 @@ public class PlayerLocal extends Player {
 	
 	@Override
 	protected void onRender(Graphics2D g, Game game) {
-		
+		//Pointer outline////
+		if(pointerOutlineStage > 0) {
+			Stroke normalStroke = g.getStroke();
+			g.setStroke(new BasicStroke(POINTER_SECONDARY_OUTLINE_WIDTH));
+			
+			
+			int colorAlpha = (int) (255 * pointerOutlineStage);
+			g.setColor(new Color(Pointer.POINTER_SECONDARY_COLOR.getRed(), Pointer.POINTER_SECONDARY_COLOR.getGreen(), Pointer.POINTER_SECONDARY_COLOR.getBlue(), colorAlpha));
+			
+			int outlineRadius = Player.SELECT_POINTER_SECONDARY_DISTANCE_LIMIT;
+			g.drawOval((int) x - outlineRadius, (int) y - (height / 2) - outlineRadius, outlineRadius * 2, outlineRadius * 2);
+			
+			
+			g.setStroke(normalStroke);
+		}
 	}
 
 	
@@ -280,10 +329,10 @@ public class PlayerLocal extends Player {
 	
 	
 	@Override
-	protected void spawnPointer(float targetX, float targetY, Game game) {
-		super.spawnPointer(targetX, targetY, game);
+	protected void spawnPointer(float targetX, float targetY, boolean isPrimaryPointer, Game game) {
+		super.spawnPointer(targetX, targetY, isPrimaryPointer, game);
 		
-		PacketSpawnPointer pointerPacket = new PacketSpawnPointer(profile.getUsername(), targetX, targetY);
+		PacketSpawnPointer pointerPacket = new PacketSpawnPointer(profile.getUsername(), targetX, targetY, isPrimaryPointer);
 		game.getGameStateManager().getGameStateInGame().getClient().sendPacket(pointerPacket);
 	}
 	
@@ -291,10 +340,18 @@ public class PlayerLocal extends Player {
 	
 	
 	
+	public boolean isSleepingAllowed() {
+		return isSleepingAllowed;
+	}
+	
+	public void setIsSleepingAllowed(boolean isSleepingAllowed) {
+		this.isSleepingAllowed = isSleepingAllowed;
+	}
+	
+	
 	public boolean isPointingEnabled() {
 		return isPointingEnabled;
 	}
-	
 	
 	public void setIsPointingEnabled(boolean isPointingEnabled) {
 		this.isPointingEnabled = isPointingEnabled;

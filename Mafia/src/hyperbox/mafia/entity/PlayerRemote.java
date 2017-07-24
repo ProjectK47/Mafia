@@ -93,22 +93,24 @@ public class PlayerRemote extends Player {
 				
 				
 				if(pointerPacket.getUsername().equals(profile.getUsername())) {
-					spawnPointer(pointerPacket.getTargetX(), pointerPacket.getTargetY(), game);
+					spawnPointer(pointerPacket.getTargetX(), pointerPacket.getTargetY(), pointerPacket.isPrimaryPointer(), game);
 					
 					
-					PlayerLocal localPlayer = game.getGameStateManager().getGameStateInGame().getPlayer();
-					
-					if(localPlayer.isPointOnPlayer(pointerPacket.getTargetX(), pointerPacket.getTargetY())) {
+					if(!pointerPacket.isPrimaryPointer()) {
+						PlayerLocal localPlayer = game.getGameStateManager().getGameStateInGame().getPlayer();
 						
 						
-						ChatMessage pointMessage;
-						
-						if(!localPlayer.isSleeping())
-							pointMessage = new ChatMessage("Game", profile.getUsername() + " has pointed to/poked you!", true);
-						else
-							pointMessage = new ChatMessage("Game", "Someone has pointed to/poked you!", true);
-						
-						game.getGameStateManager().getGameStateInGame().getChatElement().addMessage(pointMessage, false, game);
+						if(localPlayer.isPointOnPlayer(pointerPacket.getTargetX(), pointerPacket.getTargetY())) {
+							
+							ChatMessage pointMessage;
+							
+							if(!localPlayer.isSleeping())
+								pointMessage = new ChatMessage("Game", profile.getUsername() + " has poked you!", true);
+							else
+								pointMessage = new ChatMessage("Game", "Someone has poked you!", true);
+							
+							game.getGameStateManager().getGameStateInGame().getChatElement().addMessage(pointMessage, false, game);
+						}
 					}
 					
 					

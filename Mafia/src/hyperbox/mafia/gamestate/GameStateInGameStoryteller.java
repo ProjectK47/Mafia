@@ -47,7 +47,7 @@ public class GameStateInGameStoryteller extends GameState {
 					
 					
 					votedPlayerUsername = player.getProfile().getUsername();
-				});
+				}, true);
 			}
 			
 			

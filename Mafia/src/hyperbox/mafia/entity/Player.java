@@ -18,8 +18,8 @@ import hyperbox.mafia.io.FontResources;
 import hyperbox.mafia.io.ImageResources;
 import hyperbox.mafia.net.Packet;
 import hyperbox.mafia.net.PacketID;
-import hyperbox.mafia.net.PacketPlayerStateAction;
 import hyperbox.mafia.net.PacketPlayerProfile;
+import hyperbox.mafia.net.PacketPlayerStateAction;
 import hyperbox.mafia.particle.FloatRange;
 import hyperbox.mafia.particle.IntRange;
 import hyperbox.mafia.particle.ParticleSystem;
@@ -43,6 +43,7 @@ public abstract class Player extends Entity {
 	public static final float SLEEPING_ICON_WAVE_SPEED = 6f;
 	
 	public static final float HOVER_TRANSPARENCY = 0.75f;
+	public static final int SELECT_POINTER_SECONDARY_DISTANCE_LIMIT = 175;
 	
 	
 	public static final float STATE_ACTION_HOVER_TEXT_SIZE = 12f;
@@ -90,7 +91,10 @@ public abstract class Player extends Entity {
 	protected ArrayList<Pointer> pointers = new ArrayList<Pointer>();
 	
 	protected boolean isHovering = false;
+	
 	protected Runnable selectRunnable;
+	protected boolean isSelectPrimary;
+	
 	protected boolean areStateActionsAllowed;
 	
 	protected byte tallyCount;
@@ -123,6 +127,8 @@ public abstract class Player extends Entity {
 		isSleeping = false;
 		
 		selectRunnable = null;
+		isSelectPrimary = true;
+		
 		areStateActionsAllowed = false;
 		
 		tallyCount = -1;
@@ -156,11 +162,12 @@ public abstract class Player extends Entity {
 		
 		
 		
-		//Hover////
-		isHovering = false;
-		
 		int mouseX = MouseInput.grabWorldMouseX(game);
 		int mouseY = MouseInput.grabWorldMouseY(game);
+		
+		
+		//Hover////
+		isHovering = false;
 		
 		if(mouseX >= x - (width / 2) && mouseX <= x + (width / 2))
 			if(mouseY >= y - height && mouseY <= y)
@@ -170,9 +177,27 @@ public abstract class Player extends Entity {
 		
 		//Selection////
 		if(isHovering && selectRunnable != null) {
-			if(MouseInput.wasPrimaryClicked()) {
-				selectRunnable.run();
+			boolean shouldRun = false;
+			
+			
+			if(isSelectPrimary) {
+				if(MouseInput.wasPrimaryClicked(false))
+					shouldRun = true;
 				
+			} else {
+				PlayerLocal localPlayer = game.getGameStateManager().getGameStateInGame().getPlayer();
+				
+				if(MouseInput.wasSecondaryClicked(false))
+					if(NumberUtils.distance(localPlayer.getX(), localPlayer.getY() - (localPlayer.getHeight() / 2), 
+							mouseX, mouseY) <= SELECT_POINTER_SECONDARY_DISTANCE_LIMIT) {
+						
+						shouldRun = true;
+					}
+			}
+			
+			
+			if(shouldRun) {
+				selectRunnable.run();
 				AudioResources.selectionClick.playAudio();
 			}
 		}
@@ -408,8 +433,8 @@ public abstract class Player extends Entity {
 	
 	
 	
-	protected void spawnPointer(float targetX, float targetY, Game game) {
-		Pointer pointer = new Pointer(x, y - (height / 2), targetX, targetY);
+	protected void spawnPointer(float targetX, float targetY, boolean isPrimaryPointer, Game game) {
+		Pointer pointer = new Pointer(x, y - (height / 2), targetX, targetY, isPrimaryPointer);
 		
 		pointers.add(pointer);
 	}
@@ -417,12 +442,14 @@ public abstract class Player extends Entity {
 	
 	
 	
-	public void enableSelection(Runnable runnable) {
+	public void enableSelection(Runnable runnable, boolean isPrimary) {
 		selectRunnable = runnable;
+		isSelectPrimary = isPrimary;
 	}
 	
 	public void disableSelection() {
 		selectRunnable = null;
+		isSelectPrimary = true;
 	}
 	
 	

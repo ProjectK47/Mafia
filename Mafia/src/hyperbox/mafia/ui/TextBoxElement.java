@@ -56,7 +56,7 @@ public class TextBoxElement extends UIElement {
 	public TextBoxElement(int x, int y, UIAnchor screenAnchorX, UIAnchor screenAnchorY, UIAnchor elementAnchorX, UIAnchor elementAnchorY,
 			float size, String boxText, String labelText, UIAnchor labelAnchorX, int maxBoxTextLength, String allowedChars) {
 		
-		super(x, y, 0, 0, screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY);
+		super(x, y, 0, 0, screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, true);
 		
 		
 		this.size = size;
@@ -85,7 +85,7 @@ public class TextBoxElement extends UIElement {
 	
 	
 	@Override
-	public void tick(Game game) {
+	public void onTick(Game game) {
 		width = boxTextElement.getWidth();
 		height = boxTextElement.getHeight();
 		
@@ -105,7 +105,7 @@ public class TextBoxElement extends UIElement {
 		
 		
 		//Set focused////
-		if(MouseInput.wasPrimaryClicked()) {
+		if(MouseInput.wasPrimaryClicked(true)) {
 			if(isHovering) {
 				addFocus();
 				

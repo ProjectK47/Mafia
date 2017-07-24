@@ -27,7 +27,7 @@ public class TextElement extends UIElement {
 	public TextElement(int x, int y, UIAnchor screenAnchorX, UIAnchor screenAnchorY, UIAnchor elementAnchorX, UIAnchor elementAnchorY,
 			String text, float size, Color color) {
 		
-		super(x, y, 0, 0, screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY);
+		super(x, y, 0, 0, screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, false);
 		
 		
 		this.text = text;
@@ -40,7 +40,7 @@ public class TextElement extends UIElement {
 	
 	
 	@Override
-	public void tick(Game game) {
+	public void onTick(Game game) {
 		
 	}
 

@@ -12,9 +12,11 @@ public class PacketSpawnPointer extends Packet {
 	private float targetX;
 	private float targetY;
 	
+	private boolean isPrimaryPointer;
 	
 	
-	public PacketSpawnPointer(String username, float targetX, float targetY) {
+	
+	public PacketSpawnPointer(String username, float targetX, float targetY, boolean isPrimaryPointer) {
 		super(PacketID.SPAWN_POINTER);
 		
 		
@@ -22,6 +24,8 @@ public class PacketSpawnPointer extends Packet {
 		
 		this.targetX = targetX;
 		this.targetY = targetY;
+		
+		this.isPrimaryPointer = isPrimaryPointer;
 	}
 	
 	
@@ -38,6 +42,8 @@ public class PacketSpawnPointer extends Packet {
 		
 		this.targetX = in.readFloat();
 		this.targetY = in.readFloat();
+		
+		this.isPrimaryPointer = in.readBoolean();
 	}
 
 
@@ -47,6 +53,8 @@ public class PacketSpawnPointer extends Packet {
 		
 		out.writeFloat(targetX);
 		out.writeFloat(targetY);
+		
+		out.writeBoolean(isPrimaryPointer);
 	}
 
 
@@ -65,6 +73,11 @@ public class PacketSpawnPointer extends Packet {
 
 	public float getTargetY() {
 		return targetY;
+	}
+	
+	
+	public boolean isPrimaryPointer() {
+		return isPrimaryPointer;
 	}
 
 }

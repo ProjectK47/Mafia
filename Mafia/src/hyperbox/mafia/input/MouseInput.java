@@ -5,8 +5,11 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import hyperbox.mafia.core.Game;
+import hyperbox.mafia.ui.UIElement;
 
 public class MouseInput implements MouseListener, MouseMotionListener, MouseWheelListener {
 
@@ -25,6 +28,9 @@ public class MouseInput implements MouseListener, MouseMotionListener, MouseWhee
 	private static boolean wasPrimaryClicked = false;
 	private static boolean wasSecondaryClicked = false;
 	private static boolean wasMiddleClicked = false;
+	
+	
+	private static ArrayList<UIElement> elementsMousingOver = new ArrayList<UIElement>();
 	
 	
 	
@@ -106,12 +112,22 @@ public class MouseInput implements MouseListener, MouseMotionListener, MouseWhee
 
 	
 	
-	public static void tick() {
+	public static void tick(Game game) {
 		wasPrimaryClicked = false;
 		wasSecondaryClicked = false;
 		wasMiddleClicked = false;
 		
 		amountScrolled = 0;
+		
+		
+		Iterator<UIElement> it = elementsMousingOver.iterator();
+		
+		while(it.hasNext()) {
+			UIElement element = it.next();
+			
+			if(game.getCurrentTick() - element.getLastTick() > 1)
+				it.remove();
+		}
 	}
 	
 	
@@ -137,30 +153,90 @@ public class MouseInput implements MouseListener, MouseMotionListener, MouseWhee
 	
 	
 	
+	public static void addElementMousingOver(UIElement element) {
+		if(!elementsMousingOver.contains(element))
+			elementsMousingOver.add(element);
+	}
 	
-	public static boolean isPrimaryPressed() {
+	public static void removeElementMousingOver(UIElement element) {
+		if(elementsMousingOver.contains(element))
+			elementsMousingOver.remove(element);
+	}
+	
+	
+	
+	
+	public static boolean isPrimaryPressed(boolean isUI) {
+		if(elementsMousingOver.size() > 0) {
+			if(isPrimaryPressed && isUI)
+				return true;
+			
+			return false;
+		}
+		
+		
 		return isPrimaryPressed;
 	}
 	
-	public static boolean isSecondaryPressed() {
+	public static boolean isSecondaryPressed(boolean isUI) {
+		if(elementsMousingOver.size() > 0) {
+			if(isSecondaryPressed && isUI)
+				return true;
+			
+			return false;
+		}
+		
+		
 		return isSecondaryPressed;
 	}
 	
-	public static boolean isMiddlePressed() {
+	public static boolean isMiddlePressed(boolean isUI) {
+		if(elementsMousingOver.size() > 0) {
+			if(isMiddlePressed && isUI)
+				return true;
+			
+			return false;
+		}
+		
+		
 		return isMiddlePressed;
 	}
 	
 	
 	
-	public static boolean wasPrimaryClicked() {
+	public static boolean wasPrimaryClicked(boolean isUI) {
+		if(elementsMousingOver.size() > 0) {
+			if(wasPrimaryClicked && isUI)
+				return true;
+			
+			return false;
+		}
+		
+		
 		return wasPrimaryClicked;
 	}
 	
-	public static boolean wasSecondaryClicked() {
+	public static boolean wasSecondaryClicked(boolean isUI) {
+		if(elementsMousingOver.size() > 0) {
+			if(wasSecondaryClicked && isUI)
+				return true;
+			
+			return false;
+		}
+		
+		
 		return wasSecondaryClicked;
 	}
 	
-	public static boolean wasMiddleClicked() {
+	public static boolean wasMiddleClicked(boolean isUI) {
+		if(elementsMousingOver.size() > 0) {
+			if(wasMiddleClicked && isUI)
+				return true;
+			
+			return false;
+		}
+		
+		
 		return wasMiddleClicked;
 	}
 	

@@ -60,4 +60,15 @@ public class NumberUtils {
 	}
 	
 	
+	
+	public static float distance(float x1, float y1, float x2, float y2) {
+		float xLength = x2 - x1;
+		float yLength = y2 - y1;
+		
+		float distance = (float) Math.sqrt(Math.pow(xLength, 2) + Math.pow(yLength, 2));
+		
+		
+		return distance;
+	}
+	
 }

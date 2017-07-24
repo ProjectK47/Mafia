@@ -20,7 +20,9 @@ import hyperbox.mafia.net.PacketChoosePrimary;
 import hyperbox.mafia.net.PacketID;
 import hyperbox.mafia.net.PacketPlayerDisconnect;
 import hyperbox.mafia.net.PacketPlayerProfile;
+import hyperbox.mafia.net.PacketResetGame;
 import hyperbox.mafia.particle.Particle;
+import hyperbox.mafia.ui.ButtonElement;
 import hyperbox.mafia.ui.ChatElement;
 import hyperbox.mafia.ui.ChatMessage;
 import hyperbox.mafia.ui.SoundEffectsElement;
@@ -53,6 +55,8 @@ public class GameStateInGame extends GameState {
 	
 	private ChatElement chatElement;
 	private SoundEffectsElement soundEffectsElement;
+	
+	private ButtonElement resetGameButton;
 	
 	
 	private HashMap<String, Player> players;
@@ -92,6 +96,13 @@ public class GameStateInGame extends GameState {
 		
 		chatElement = new ChatElement(15, -15, 20, profile.getUsername(), game);
 		
+		resetGameButton = new ButtonElement(15, 100, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, 3.25f, "Reset Game", () -> {
+			resetGame(game);
+			
+			PacketResetGame resetPacket = new PacketResetGame();
+			client.sendPacket(resetPacket);
+		});
+		
 		
 		resetGame(game);
 	}
@@ -113,6 +124,8 @@ public class GameStateInGame extends GameState {
 		tipElement = new TextElement(-20, 30, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, "", 19, new Color(255, 255, 204));
 		
 		soundEffectsElement = new SoundEffectsElement(-20, 70, UIAnchor.POSITIVE, UIAnchor.CENTER, UIAnchor.POSITIVE, UIAnchor.CENTER, 6f, true);
+		
+		resetGameButton.setIsHidden(true);
 		
 		
 		isLoginCheckDone = false;
@@ -174,7 +187,10 @@ public class GameStateInGame extends GameState {
 		
 		
 		for(String username : players.keySet()) {
-			players.get(username).tick(game);
+			Player player = players.get(username);
+			
+			
+			player.tick(game);
 			
 			//Disable selection for out players////
 			if(player.getAliveState() != 1)
@@ -210,6 +226,8 @@ public class GameStateInGame extends GameState {
 		
 		chatElement.tick(game);
 		soundEffectsElement.tick(game);
+		
+		resetGameButton.tick(game);
 		
 		
 		
@@ -252,6 +270,8 @@ public class GameStateInGame extends GameState {
 		
 		chatElement.render(g, game);
 		soundEffectsElement.render(g, game);
+		
+		resetGameButton.render(g, game);
 	}
 
 	
@@ -554,6 +574,11 @@ public class GameStateInGame extends GameState {
 	
 	protected SoundEffectsElement getSoundEffectsElement() {
 		return soundEffectsElement;
+	}
+	
+	
+	protected ButtonElement getResetGameButton() {
+		return resetGameButton;
 	}
 	
 	

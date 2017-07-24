@@ -12,7 +12,9 @@ public class Pointer {
 	
 	public static final float POINTER_STAGE_SPEED = 0.09f;
 	
-	public static final Color POINTER_COLOR = new Color(255, 255, 230);
+	public static final Color POINTER_PRIMARY_COLOR = new Color(255, 255, 230);
+	public static final Color POINTER_SECONDARY_COLOR = new Color(255, 174, 87);
+	
 	public static final float POINTER_THINKNESS = 2.5f;
 	
 	
@@ -22,18 +24,22 @@ public class Pointer {
 	private float targetX;
 	private float targetY;
 	
+	private boolean isPrimaryPointer;
+	
 	
 	private float pointerStage = 0f;
 	private boolean hasFinished = false;
 	
 	
 	
-	public Pointer(float startX, float startY, float targetX, float targetY) {
+	public Pointer(float startX, float startY, float targetX, float targetY, boolean isPrimaryPointer) {
 		this.startX = startX;
 		this.startY = startY;
 		
 		this.targetX = targetX;
 		this.targetY = targetY;
+		
+		this.isPrimaryPointer = isPrimaryPointer;
 	}
 	
 	
@@ -63,7 +69,11 @@ public class Pointer {
 		
 		int colorAlpha = (int) (255 - 255 * pointerStage);
 		
-		g.setColor(new Color(POINTER_COLOR.getRed(), POINTER_COLOR.getGreen(), POINTER_COLOR.getBlue(), colorAlpha));
+		if(isPrimaryPointer)
+			g.setColor(new Color(POINTER_PRIMARY_COLOR.getRed(), POINTER_PRIMARY_COLOR.getGreen(), POINTER_PRIMARY_COLOR.getBlue(), colorAlpha));
+		else
+			g.setColor(new Color(POINTER_SECONDARY_COLOR.getRed(), POINTER_SECONDARY_COLOR.getGreen(), POINTER_SECONDARY_COLOR.getBlue(), colorAlpha));
+		
 		g.setStroke(new BasicStroke(POINTER_THINKNESS));
 		
 		g.drawLine(pointOneX, pointOneY, (int) startX, (int) startY);
@@ -92,6 +102,11 @@ public class Pointer {
 	
 	public float getTargetY() {
 		return targetY;
+	}
+	
+	
+	public boolean isPrimaryPointer() {
+		return isPrimaryPointer;
 	}
 	
 	

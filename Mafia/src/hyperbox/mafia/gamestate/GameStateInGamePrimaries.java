@@ -44,12 +44,15 @@ public class GameStateInGamePrimaries extends GameState {
 							ChatMessage doctorMessage = new ChatMessage("Game", "You chose " + player.getProfile().getUsername() + " to be the Doctor!", true);
 							gameStateInGame.getChatElement().addMessage(doctorMessage, false, game);
 						}
-					});
+					}, false);
 					
 					
 					player.setAreStateActionsAllowed(true);
 				}
 			}
+			
+			
+			gameStateInGame.getResetGameButton().setIsHidden(false);
 			
 			
 		} else {
@@ -58,8 +61,11 @@ public class GameStateInGamePrimaries extends GameState {
 		}
 		
 		
-		if(gameStateInGame.getPlayer().getAliveState() == 1)
+		
+		if(gameStateInGame.getPlayer().getAliveState() == 1) {
+			gameStateInGame.getPlayer().setIsSleepingAllowed(true);
 			gameStateInGame.getPlayer().setIsPointingEnabled(true);
+		}
 	}
 
 	

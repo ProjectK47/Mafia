@@ -235,7 +235,7 @@ public class GameStateInGameElimination extends GameState {
 						
 						ChatMessage mafiaMessage = new ChatMessage("Game", "You chose to kill " + chosenUsername + "!", true);
 						gameStateInGame.getChatElement().addMessage(mafiaMessage, false, game);
-					});
+					}, true);
 				}
 			}
 		
@@ -270,7 +270,7 @@ public class GameStateInGameElimination extends GameState {
 								players.get(votedPlayerUsername).decrementTally(game);
 							
 							votedPlayerUsername = player.getProfile().getUsername();
-						});
+						}, true);
 					}
 					
 					
@@ -362,7 +362,7 @@ public class GameStateInGameElimination extends GameState {
 								
 								ChatMessage doctorMessage = new ChatMessage("Game", "You chose to save " + chosenUsername + "!", true);
 								gameStateInGame.getChatElement().addMessage(doctorMessage, false, game);
-							});
+							}, true);
 						}
 					}
 				
