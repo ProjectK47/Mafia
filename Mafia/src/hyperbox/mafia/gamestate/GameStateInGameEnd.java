@@ -8,6 +8,7 @@ import java.awt.geom.Point2D;
 import hyperbox.mafia.animation.CoolDown;
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.net.PacketResetGame;
+import hyperbox.mafia.ui.ChatMessage;
 import hyperbox.mafia.ui.TextElement;
 import hyperbox.mafia.ui.UIAnchor;
 
@@ -112,6 +113,9 @@ public class GameStateInGameEnd extends GameState {
 				
 				PacketResetGame resetPacket = new PacketResetGame();
 				gameStateInGame.getClient().sendPacket(resetPacket);
+				
+				ChatMessage resetMessage = new ChatMessage("Game", "A new game has begun.", true);
+				gameStateInGame.getChatElement().addMessage(resetMessage, true, game);
 			}
 			
 		}, true);

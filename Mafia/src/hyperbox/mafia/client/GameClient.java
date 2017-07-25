@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import hyperbox.mafia.core.Game;
 import hyperbox.mafia.net.Packet;
 import hyperbox.mafia.net.PacketPlayerProfile;
 import hyperbox.mafia.net.PacketRunnable;
@@ -64,13 +65,14 @@ public class GameClient implements Runnable {
 			out = new DataOutputStream(socket.getOutputStream());
 			
 			
+			out.writeUTF(Game.VERSION);	
 			playerProfile.writePacket(out);
 			
 			initialPlayerCount = in.readInt();
 			
-
 			
 			hasReceivedBaseData = true;
+			
 			
 			while(true) {
 				byte packetID = Packet.readID(in);

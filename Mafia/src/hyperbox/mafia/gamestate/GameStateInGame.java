@@ -101,6 +101,9 @@ public class GameStateInGame extends GameState {
 			
 			PacketResetGame resetPacket = new PacketResetGame();
 			client.sendPacket(resetPacket);
+			
+			ChatMessage resetMessage = new ChatMessage("Game", "The Storyteller chose to reset the game.", true);
+			chatElement.addMessage(resetMessage, true, game);
 		});
 		
 		
@@ -152,10 +155,6 @@ public class GameStateInGame extends GameState {
 		
 		client.clearPackets();
 		doLoginCheck(game);
-		
-		
-		ChatMessage newGameMessage = new ChatMessage("Game", "A new game has begun.", true);
-		chatElement.addMessage(newGameMessage, false, game);
 	}
 	
 	
@@ -166,15 +165,7 @@ public class GameStateInGame extends GameState {
 	protected void onTick(Game game) {
 		if(!isEnabled)
 			return;
-		
-		
-		
-		if(client.isConnected()) {
-			handlePlayerPackets(game);
-			handlePrimaryChoosePackets(game);
-			handleResetGamePackets(game);
-		}
-		
+			
 		
 		
 		if(!client.isConnected() && client.wasExceptionCaught()) {
@@ -213,7 +204,6 @@ public class GameStateInGame extends GameState {
 		
 		
 		
-		
 		statusElementColorCoolDown.tick();
 		
 		statusElementColorCoolDown.executeIfReady(() -> {
@@ -231,7 +221,13 @@ public class GameStateInGame extends GameState {
 		
 		
 		
+		handlePlayerPackets(game);
+		handlePrimaryChoosePackets(game);
+		handleResetGamePackets(game);
+		
+		
 		doLoginCheck(game);
+		
 		
 		
 		if(KeyboardInput.isKeyDown(KeyEvent.VK_SHIFT, false) && KeyboardInput.wasKeyTyped(KeyEvent.VK_ESCAPE, false))

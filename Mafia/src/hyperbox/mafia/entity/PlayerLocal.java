@@ -66,7 +66,7 @@ public class PlayerLocal extends Player {
 		super.resetMetadata();
 		
 		isSleepingAllowed = false;
-		isPointingEnabled = true; //TODO change
+		isPointingEnabled = false;
 	}
 	
 	

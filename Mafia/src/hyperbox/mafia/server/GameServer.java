@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import hyperbox.mafia.core.Game;
 import hyperbox.mafia.net.Packet;
 import hyperbox.mafia.net.PacketPlayerDisconnect;
 import hyperbox.mafia.net.PacketPlayerProfile;
@@ -54,10 +55,25 @@ public class GameServer implements Runnable {
 				DataInputStream in = new DataInputStream(socket.getInputStream());
 				String ip = socket.getRemoteSocketAddress().toString();
 				
+				
+				//Check version////
+				String version = in.readUTF();
+				
+				if(!version.equals(Game.VERSION)) {
+					System.out.println(ip + " - client version '" + version + "' doesn't match server version '" + 
+							Game.VERSION + "'. Disconnecting.");
+					
+					socket.close();
+					continue;
+				}
+				
+				
+				//Read profile////
 				Packet.readID(in);
 				PacketPlayerProfile profile = new PacketPlayerProfile(in);
 				
 				
+				//Check for username conflict////
 				boolean isUsernamePresent = false;
 				
 				for(GameServerClient client : clients)
@@ -76,6 +92,7 @@ public class GameServer implements Runnable {
 				
 					
 				
+				//Add client////
 				GameServerClient client = new GameServerClient(socket, profile, this);
 				clients.add(client);
 				
