@@ -8,9 +8,12 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
+import hyperbox.mafia.animation.CoolDown;
 import hyperbox.mafia.animation.Pointer;
 import hyperbox.mafia.core.Game;
+import hyperbox.mafia.gamestate.GameStateInGame;
 import hyperbox.mafia.input.KeyboardInput;
 import hyperbox.mafia.input.MouseInput;
 import hyperbox.mafia.io.AudioResources;
@@ -43,7 +46,7 @@ public abstract class Player extends Entity {
 	public static final float SLEEPING_ICON_WAVE_SPEED = 6f;
 	
 	public static final float HOVER_TRANSPARENCY = 0.75f;
-	public static final int SELECT_POINTER_SECONDARY_DISTANCE_LIMIT = 175;
+	public static final int SELECT_POINTER_SECONDARY_DISTANCE_LIMIT = 125;
 	
 	
 	public static final float STATE_ACTION_HOVER_TEXT_SIZE = 12f;
@@ -75,6 +78,11 @@ public abstract class Player extends Entity {
 			new IntRange(1, 4),
 			new IntRange(15, 60),
 			new IntRange(0, 35), new IntRange(40, 50));
+	
+	
+	public static final int WALK_SOUND_COOL_DOWN = 35;
+	public static final float WALK_SOUND_MAX_DISTANCE = 450;
+	public static final float WALK_SOUND_MAX_VOLUME_DECREASE = 17.5f;
 
 	
 	protected PacketPlayerProfile profile;
@@ -100,6 +108,11 @@ public abstract class Player extends Entity {
 	protected byte tallyCount;
 	
 	protected Color specialNameTagColor;
+	
+	protected CoolDown walkSoundCoolDown = new CoolDown(WALK_SOUND_COOL_DOWN);
+	
+	
+	private Random random = new Random();
 	
 	
 	
@@ -141,6 +154,8 @@ public abstract class Player extends Entity {
 	
 	@Override
 	public void tick(Game game) {
+		GameStateInGame gameStateInGame = game.getGameStateManager().getGameStateInGame();
+		
 		
 		//Sleeping icon////
 		sleepingIconWaveX += SLEEPING_ICON_WAVE_SPEED;
@@ -181,13 +196,13 @@ public abstract class Player extends Entity {
 			
 			
 			if(isSelectPrimary) {
-				if(MouseInput.wasPrimaryClicked(false))
+				if(MouseInput.wasPrimaryClicked(0))
 					shouldRun = true;
 				
 			} else {
-				PlayerLocal localPlayer = game.getGameStateManager().getGameStateInGame().getPlayer();
+				PlayerLocal localPlayer = gameStateInGame.getPlayer();
 				
-				if(MouseInput.wasSecondaryClicked(false))
+				if(MouseInput.wasSecondaryClicked(0))
 					if(NumberUtils.distance(localPlayer.getX(), localPlayer.getY() - (localPlayer.getHeight() / 2), 
 							mouseX, mouseY) <= SELECT_POINTER_SECONDARY_DISTANCE_LIMIT) {
 						
@@ -216,7 +231,7 @@ public abstract class Player extends Entity {
 		
 		
 		
-		game.getGameStateManager().getGameStateInGame().getClient().forEachReceivedPacket((Packet packet) -> {
+		gameStateInGame.getClient().forEachReceivedPacket((Packet packet) -> {
 			if(packet.getID() == PacketID.PLAYER_STATE_ACTION) {
 				
 				PacketPlayerStateAction actionPacket = (PacketPlayerStateAction) packet;
@@ -236,6 +251,43 @@ public abstract class Player extends Entity {
 		
 		
 		
+		
+		//Walk sound////
+		String storytellerUsername = gameStateInGame.getStorytellerUsername();
+		
+		
+		boolean shouldTickWalkSound = false;
+		
+		if(storytellerUsername != null && animationStage != 0)
+			if(storytellerUsername.equals(profile.getUsername()))
+				shouldTickWalkSound = true;
+		
+		
+		
+		if(shouldTickWalkSound) {
+			walkSoundCoolDown.tick();
+			
+			
+			walkSoundCoolDown.executeIfReady(() -> {
+				PlayerLocal localPlayer = gameStateInGame.getPlayer();
+				
+				float playerDistance = NumberUtils.distance(x, y, localPlayer.getX(), localPlayer.getY());
+				float playerDistanceScaled = Math.min(playerDistance, WALK_SOUND_MAX_DISTANCE) / WALK_SOUND_MAX_DISTANCE;
+				
+				float volumeDelta = -playerDistanceScaled * WALK_SOUND_MAX_VOLUME_DECREASE;
+				
+				
+				if(random.nextBoolean())
+					AudioResources.playerWalkOne.playAudio(volumeDelta);
+				else
+					AudioResources.playerWalkTwo.playAudio(volumeDelta);
+			});
+			
+		} else {
+			walkSoundCoolDown.resetCurrentCoolDown();
+		}
+		
+			
 		onTick(game);
 	}
 

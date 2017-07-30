@@ -22,6 +22,7 @@ public class AudioClip {
 	
 	
 	private Clip clip;
+	private FloatControl volume;
 	
 	
 	
@@ -61,8 +62,7 @@ public class AudioClip {
 			clip.open(audioIn);
 			
 			
-			FloatControl volume = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-			volume.setValue(volumeAdjustment);
+			volume = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
 		} catch (LineUnavailableException | UnsupportedAudioFileException | IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -73,6 +73,11 @@ public class AudioClip {
 	
 	
 	public void playAudio() {
+		playAudio(0);
+	}
+	
+	
+	public void playAudio(float volumeDelta) {
 		boolean isPlaying = false;
 		
 		if(clip != null)
@@ -89,6 +94,9 @@ public class AudioClip {
 			});
 		}
 		
+		
+		float newVolume = Math.max(Math.min(volumeAdjustment + volumeDelta, volume.getMaximum()), volume.getMinimum());
+		volume.setValue(newVolume);
 		
 		clip.setFramePosition(0);
 		clip.start();

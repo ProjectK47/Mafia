@@ -70,7 +70,7 @@ public class SoundEffectsElement extends UIElement {
 	
 	
 	public SoundEffectsElement(int x, int y, UIAnchor screenAnchorX, UIAnchor screenAnchorY, UIAnchor elementAnchorX, UIAnchor elementAnchorY, float scale, boolean isDisabled) {
-		super(x, y, 0, 0, screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, true);
+		super(x, y, 0, 0, screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, 1);
 		
 		this.scale = scale;
 		
@@ -175,7 +175,7 @@ public class SoundEffectsElement extends UIElement {
 		
 		//Local playing////
 		if(selectedEntry != -1)
-			if(MouseInput.wasPrimaryClicked(true)) {
+			if(MouseInput.wasPrimaryClicked(this.mousePriority)) {
 				soundEffects.get(selectedEntry).getAudioClip().playAudio();
 				
 				PacketSoundEffect soundEffectPacket = new PacketSoundEffect(selectedEntry);

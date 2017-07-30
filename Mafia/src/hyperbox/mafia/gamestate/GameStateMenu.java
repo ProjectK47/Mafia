@@ -11,6 +11,8 @@ import hyperbox.mafia.io.ImageResources;
 import hyperbox.mafia.io.Settings;
 import hyperbox.mafia.ui.ButtonElement;
 import hyperbox.mafia.ui.ImageElement;
+import hyperbox.mafia.ui.SplashElement;
+import hyperbox.mafia.ui.SplashImage;
 import hyperbox.mafia.ui.TextBoxElement;
 import hyperbox.mafia.ui.TextElement;
 import hyperbox.mafia.ui.UIAnchor;
@@ -45,6 +47,9 @@ public class GameStateMenu extends GameState {
 	private ImageElement k47LogoElement;
 	
 	private TextBoxElement usernameElement;
+	
+	
+	private SplashElement splashElement;
 	
 	
 	
@@ -98,6 +103,10 @@ public class GameStateMenu extends GameState {
 		
 		usernameElement = new TextBoxElement(30, 50, UIAnchor.NEGATIVE, UIAnchor.CENTER, UIAnchor.NEGATIVE, UIAnchor.CENTER,
 				25, settings.grabValue("username", "Player"), "Username", UIAnchor.NEGATIVE, 15, TextBoxElement.ALL_CHARS);
+		
+		
+		
+		splashElement = new SplashElement(new SplashImage(ImageResources.projectK47Logo, 0.25f, Color.BLACK));
 	}
 	
 	
@@ -132,6 +141,9 @@ public class GameStateMenu extends GameState {
 		hostButtonElement.tick(game);
 		
 		usernameElement.tick(game);
+		
+		
+		splashElement.tick(game);
 	}
 
 	
@@ -168,6 +180,9 @@ public class GameStateMenu extends GameState {
 		k47LogoElement.render(g, game);
 		
 		usernameElement.render(g, game);
+		
+		
+		splashElement.render(g, game);
 	}
 
 	

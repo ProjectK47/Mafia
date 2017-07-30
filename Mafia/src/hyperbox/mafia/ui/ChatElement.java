@@ -43,7 +43,7 @@ public class ChatElement extends UIElement {
 	
 	
 	public ChatElement(int x, int y, float size, String localUserUsername, Game game) {	
-		super(x, y, 0, 0, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, true);
+		super(x, y, 0, 0, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, 1);
 		
 		
 		this.size = size;

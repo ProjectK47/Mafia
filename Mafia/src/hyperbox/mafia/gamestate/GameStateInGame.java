@@ -190,6 +190,15 @@ public class GameStateInGame extends GameState {
 		
 		
 		
+		//Disable sleep/pointing if player is out////
+		if(player.getAliveState() != 1) {
+			player.setIsSleepingAllowed(false);
+			player.setIsPointingEnabled(false);
+		}
+		
+		
+		
+		
 		Iterator<Particle> it = particles.iterator();
 		
 		while(it.hasNext()) {
@@ -584,7 +593,7 @@ public class GameStateInGame extends GameState {
 	
 	
 	
-	protected String getStorytellerUsername() {
+	public String getStorytellerUsername() {
 		return storytellerUsername;
 	}
 	
@@ -596,7 +605,7 @@ public class GameStateInGame extends GameState {
 	}
 	
 	
-	protected String getMafiaUsername() {
+	public String getMafiaUsername() {
 		return mafiaUsername;
 	}
 	
@@ -608,7 +617,7 @@ public class GameStateInGame extends GameState {
 	}
 	
 	
-	protected String getDoctorUsername() {
+	public String getDoctorUsername() {
 		return doctorUsername;
 	}
 	

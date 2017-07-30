@@ -17,7 +17,7 @@ public class ImageElement extends UIElement {
 	public ImageElement(int x, int y, UIAnchor screenAnchorX, UIAnchor screenAnchorY, UIAnchor elementAnchorX, UIAnchor elementAnchorY,
 			BufferedImage image, float scale) {
 		
-		super(x, y, (int) (image.getWidth() * scale), (int) (image.getHeight() * scale), screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, false);
+		super(x, y, (int) (image.getWidth() * scale), (int) (image.getHeight() * scale), screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, 0);
 		
 		
 		this.image = image;

@@ -42,7 +42,7 @@ public class Window {
 	
 	public void showWindow() {
 		frame.setVisible(true);
-		frame.requestFocus();
+		game.requestFocus();
 		
 		game.init();
 	}

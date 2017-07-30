@@ -170,20 +170,21 @@ public class PlayerLocal extends Player {
 		
 		
 		//Apply velocity////
-		float lastX = x;
-		float lastY = y;
+		boolean moveX = false;
+		boolean moveY = false;
 		
-		x += velocityX;
-		y += velocityY;
+		if(game.getMap().grabTileAtCoords(x + velocityX, y, game) != Tile.WATER)
+			moveX = true;
+		
+		if(game.getMap().grabTileAtCoords(x, y + velocityY, game) != Tile.WATER)
+			moveY = true;
 		
 		
+		if(moveX)
+			x += velocityX;
 		
-		Tile tile = game.getMap().grabTileAtCoords(x, y, game);
-		
-		if(tile == Tile.WATER) {
-			x = lastX;
-			y = lastY;
-		}
+		if(moveY)
+			y += velocityY;
 		
 		
 		
@@ -216,12 +217,12 @@ public class PlayerLocal extends Player {
 			int pointerTargetY = MouseInput.grabWorldMouseY(game);
 			
 			
-			if(MouseInput.wasPrimaryClicked(false)) {
+			if(MouseInput.wasPrimaryClicked(0)) {
 				spawnPointer(pointerTargetX, pointerTargetY, true, game);
 			}
 			
 			
-			if(MouseInput.wasSecondaryClicked(false)) {
+			if(MouseInput.wasSecondaryClicked(0)) {
 				float targetDistance = NumberUtils.distance(x, y - (height / 2), pointerTargetX, pointerTargetY);
 				
 				if(targetDistance <= Player.SELECT_POINTER_SECONDARY_DISTANCE_LIMIT) {
@@ -346,6 +347,9 @@ public class PlayerLocal extends Player {
 	
 	public void setIsSleepingAllowed(boolean isSleepingAllowed) {
 		this.isSleepingAllowed = isSleepingAllowed;
+		
+		if(!isSleepingAllowed)
+			isSleeping = false;
 	}
 	
 	

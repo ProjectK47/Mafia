@@ -56,7 +56,7 @@ public class TextBoxElement extends UIElement {
 	public TextBoxElement(int x, int y, UIAnchor screenAnchorX, UIAnchor screenAnchorY, UIAnchor elementAnchorX, UIAnchor elementAnchorY,
 			float size, String boxText, String labelText, UIAnchor labelAnchorX, int maxBoxTextLength, String allowedChars) {
 		
-		super(x, y, 0, 0, screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, true);
+		super(x, y, 0, 0, screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, 1);
 		
 		
 		this.size = size;
@@ -105,7 +105,7 @@ public class TextBoxElement extends UIElement {
 		
 		
 		//Set focused////
-		if(MouseInput.wasPrimaryClicked(true)) {
+		if(MouseInput.wasPrimaryClicked(this.mousePriority)) {
 			if(isHovering) {
 				addFocus();
 				

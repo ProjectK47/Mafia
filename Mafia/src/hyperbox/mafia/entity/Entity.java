@@ -1,6 +1,7 @@
 package hyperbox.mafia.entity;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import hyperbox.mafia.core.Game;
@@ -35,6 +36,14 @@ public abstract class Entity {
 	public abstract void render(Graphics2D g, Game game);
 	
 	
+	
+	
+	
+	public Rectangle grabBounds() {
+		Rectangle bounds = new Rectangle((int) (x - width / 2), (int) (y - height), width, height);
+		
+		return bounds;
+	}
 	
 	
 	

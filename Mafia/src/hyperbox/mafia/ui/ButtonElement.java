@@ -47,7 +47,7 @@ public class ButtonElement extends UIElement {
 			float scale, String text, Runnable onPress) {
 		
 		super(x, y, (int) (ImageResources.button.getWidth() * scale), (int) (ImageResources.button.getHeight() * scale), 
-				screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, true);
+				screenAnchorX, screenAnchorY, elementAnchorX, elementAnchorY, 1);
 		
 		
 		this.scale = scale;
@@ -89,7 +89,7 @@ public class ButtonElement extends UIElement {
 		
 		
 		
-		if(isHovering && MouseInput.wasPrimaryClicked(true)) {
+		if(isHovering && MouseInput.wasPrimaryClicked(this.mousePriority)) {
 			onPress.run();
 			
 			AudioResources.buttonClick.playAudio();
@@ -132,7 +132,7 @@ public class ButtonElement extends UIElement {
 		
 		
 		if(isHovering) {
-			if(MouseInput.isPrimaryPressed(true))
+			if(MouseInput.isPrimaryPressed(this.mousePriority))
 				pressedImageElement.render(g, game);
 			else
 				hoverImageElement.render(g, game);

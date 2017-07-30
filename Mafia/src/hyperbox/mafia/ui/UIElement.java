@@ -23,7 +23,7 @@ public abstract class UIElement {
 	protected UIAnchor elementAnchorY;
 	
 	
-	protected boolean shouldBlockMouse;
+	protected int mousePriority;
 	
 	protected int lastTick;
 	protected boolean shouldAllowClickThrough = false;
@@ -33,7 +33,7 @@ public abstract class UIElement {
 	
 	
 	
-	public UIElement(int x, int y, int width, int height, UIAnchor screenAnchorX, UIAnchor screenAnchorY, UIAnchor elementAnchorX, UIAnchor elementAnchorY, boolean shouldBlockMouse) {
+	public UIElement(int x, int y, int width, int height, UIAnchor screenAnchorX, UIAnchor screenAnchorY, UIAnchor elementAnchorX, UIAnchor elementAnchorY, int mousePriority) {
 		this.x = x;
 		this.y = y;
 		
@@ -48,7 +48,7 @@ public abstract class UIElement {
 		this.elementAnchorY = elementAnchorY;
 		
 		
-		this.shouldBlockMouse = shouldBlockMouse;
+		this.mousePriority = mousePriority;
 	}
 
 
@@ -59,7 +59,7 @@ public abstract class UIElement {
 		MouseInput.removeElementMousingOver(this);
 		
 		
-		if(shouldBlockMouse && !shouldAllowClickThrough) {
+		if(!shouldAllowClickThrough) {
 			int mouseX = MouseInput.grabScreenMouseX(game);
 			int mouseY = MouseInput.grabScreenMouseY(game);
 			
@@ -75,9 +75,7 @@ public abstract class UIElement {
 					
 			
 			if(isMousingOver)
-				MouseInput.addElementMousingOver(this);
-			else
-				MouseInput.removeElementMousingOver(this);
+				MouseInput.addElementMousingOver(this, mousePriority);
 		}
 		
 		
@@ -176,8 +174,8 @@ public abstract class UIElement {
 	}
 	
 	
-	public boolean shouldBlockMouse() {
-		return shouldBlockMouse;
+	public int getMousePriority() {
+		return mousePriority;
 	}
 	
 	

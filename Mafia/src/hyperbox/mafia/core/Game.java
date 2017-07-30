@@ -8,6 +8,8 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
+import com.sun.glass.events.KeyEvent;
+
 import hyperbox.mafia.gamestate.GameStateManager;
 import hyperbox.mafia.input.KeyboardInput;
 import hyperbox.mafia.input.MouseInput;
@@ -195,6 +197,13 @@ public class Game extends Canvas implements Runnable {
 		
 		
 		currentTick ++;
+		
+		
+		if(KeyboardInput.wasKeyTyped(KeyEvent.VK_1, false))
+			AudioResources.playerWalkOne.playAudio();
+		
+		if(KeyboardInput.wasKeyTyped(KeyEvent.VK_2, false))
+			AudioResources.playerWalkTwo.playAudio();
 	}
 	
 	

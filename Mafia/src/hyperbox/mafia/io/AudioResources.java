@@ -18,6 +18,9 @@ public class AudioResources {
 	public static AudioClip playerExplosion;
 	public static AudioClip playerSave;
 	
+	public static AudioClip playerWalkOne;
+	public static AudioClip playerWalkTwo;
+	
 	////
 	
 	public static AudioClip airplaneEffect;
@@ -61,6 +64,9 @@ public class AudioResources {
 		
 		playerExplosion = new AudioClip(AUDIO_RESOURCES_PATH + "playerExplosion.wav", 5);
 		playerSave = new AudioClip(AUDIO_RESOURCES_PATH + "playerSave.wav", -1);
+		
+		playerWalkOne = new AudioClip(AUDIO_RESOURCES_PATH + "playerWalkOne.wav", -9);
+		playerWalkTwo = new AudioClip(AUDIO_RESOURCES_PATH + "playerWalkTwo.wav", -9);
 		
 		////
 		

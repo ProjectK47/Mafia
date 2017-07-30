@@ -34,6 +34,8 @@ public class GameStateInGameElimination extends GameState {
 	
 	private String votedPlayerUsername;
 	
+	private boolean hasDocMessageBeenSaid;
+	
 	
 	
 	public GameStateInGameElimination(Game game) {
@@ -53,6 +55,9 @@ public class GameStateInGameElimination extends GameState {
 		currentRoundElement = new TextElement(-20, 125, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, "", 16, new Color(255, 255, 225));
 		
 		currentRound = 0;
+		
+		
+		hasDocMessageBeenSaid = false;
 		
 		
 		if(gameStateInGame.isPlayerStoryteller())
@@ -173,6 +178,23 @@ public class GameStateInGameElimination extends GameState {
 		if(!isPlayerAlive || players.get(gameStateInGame.getMafiaUsername()).getAliveState() != 1) {
 			this.disable(game);
 			game.getGameStateManager().getGameStateInGameEnd().enable(game);
+		}
+		
+		
+		
+		
+		//Doctor dead message////
+		Player doctor = players.get(gameStateInGame.getDoctorUsername());
+		
+		if(doctor.getAliveState() != 1 && !hasDocMessageBeenSaid) {
+			
+			if(gameStateInGame.isPlayerStoryteller()) {
+				ChatMessage doctorDeadMessage = new ChatMessage("Game", "The Doctor is dead! You may announce who they were if you wish.", true);
+				gameStateInGame.getChatElement().addMessage(doctorDeadMessage, false, game);
+			}	
+			
+			
+			hasDocMessageBeenSaid = true;
 		}
 	}
 

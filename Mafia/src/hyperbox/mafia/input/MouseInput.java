@@ -5,8 +5,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.ui.UIElement;
@@ -30,7 +31,8 @@ public class MouseInput implements MouseListener, MouseMotionListener, MouseWhee
 	private static boolean wasMiddleClicked = false;
 	
 	
-	private static ArrayList<UIElement> elementsMousingOver = new ArrayList<UIElement>();
+	private static HashMap<UIElement, Integer> elementsMousingOver = new HashMap<UIElement, Integer>();
+	private static int highestElementPriority = 0;
 	
 	
 	
@@ -120,13 +122,21 @@ public class MouseInput implements MouseListener, MouseMotionListener, MouseWhee
 		amountScrolled = 0;
 		
 		
-		Iterator<UIElement> it = elementsMousingOver.iterator();
+		
+		highestElementPriority = 0;
+		
+		
+		Iterator<Map.Entry<UIElement, Integer>> it = elementsMousingOver.entrySet().iterator();
 		
 		while(it.hasNext()) {
-			UIElement element = it.next();
+			Map.Entry<UIElement, Integer> entry = it.next();
 			
-			if(game.getCurrentTick() - element.getLastTick() > 1)
+			if(game.getCurrentTick() - entry.getKey().getLastTick() > 1)
 				it.remove();
+			
+			
+			if(entry.getValue() > highestElementPriority)
+				highestElementPriority = entry.getValue();
 		}
 	}
 	
@@ -153,91 +163,61 @@ public class MouseInput implements MouseListener, MouseMotionListener, MouseWhee
 	
 	
 	
-	public static void addElementMousingOver(UIElement element) {
-		if(!elementsMousingOver.contains(element))
-			elementsMousingOver.add(element);
+	public static void addElementMousingOver(UIElement element, int priority) {
+		if(!elementsMousingOver.containsKey(element))
+			elementsMousingOver.put(element, priority);
 	}
 	
 	public static void removeElementMousingOver(UIElement element) {
-		if(elementsMousingOver.contains(element))
+		if(elementsMousingOver.containsKey(element))
 			elementsMousingOver.remove(element);
 	}
 	
 	
 	
 	
-	public static boolean isPrimaryPressed(boolean isUI) {
-		if(elementsMousingOver.size() > 0) {
-			if(isPrimaryPressed && isUI)
-				return true;
-			
-			return false;
-		}
+	public static boolean isPrimaryPressed(int priority) {
+		if(isPrimaryPressed && priority >= highestElementPriority)
+			return true;
 		
-		
-		return isPrimaryPressed;
+		return false;
 	}
 	
-	public static boolean isSecondaryPressed(boolean isUI) {
-		if(elementsMousingOver.size() > 0) {
-			if(isSecondaryPressed && isUI)
-				return true;
-			
-			return false;
-		}
+	public static boolean isSecondaryPressed(int priority) {
+		if(isSecondaryPressed && priority >= highestElementPriority)
+			return true;
 		
-		
-		return isSecondaryPressed;
+		return false;
 	}
 	
-	public static boolean isMiddlePressed(boolean isUI) {
-		if(elementsMousingOver.size() > 0) {
-			if(isMiddlePressed && isUI)
-				return true;
-			
-			return false;
-		}
+	public static boolean isMiddlePressed(int priority) {
+		if(isMiddlePressed && priority >= highestElementPriority)
+			return true;
 		
-		
-		return isMiddlePressed;
+		return false;
 	}
 	
 	
 	
-	public static boolean wasPrimaryClicked(boolean isUI) {
-		if(elementsMousingOver.size() > 0) {
-			if(wasPrimaryClicked && isUI)
-				return true;
-			
-			return false;
-		}
+	public static boolean wasPrimaryClicked(int priority) {
+		if(wasPrimaryClicked && priority >= highestElementPriority)
+			return true;
 		
-		
-		return wasPrimaryClicked;
+		return false;
 	}
 	
-	public static boolean wasSecondaryClicked(boolean isUI) {
-		if(elementsMousingOver.size() > 0) {
-			if(wasSecondaryClicked && isUI)
-				return true;
-			
-			return false;
-		}
+	public static boolean wasSecondaryClicked(int priority) {
+		if(wasSecondaryClicked && priority >= highestElementPriority)
+			return true;
 		
-		
-		return wasSecondaryClicked;
+		return false;
 	}
 	
-	public static boolean wasMiddleClicked(boolean isUI) {
-		if(elementsMousingOver.size() > 0) {
-			if(wasMiddleClicked && isUI)
-				return true;
-			
-			return false;
-		}
+	public static boolean wasMiddleClicked(int priority) {
+		if(wasMiddleClicked && priority >= highestElementPriority)
+			return true;
 		
-		
-		return wasMiddleClicked;
+		return false;
 	}
 	
 	
