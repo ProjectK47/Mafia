@@ -126,7 +126,7 @@ public class GameStateInGame extends GameState {
 		
 		tipElement = new TextElement(-20, 30, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, "", 19, new Color(255, 255, 204));
 		
-		soundEffectsElement = new SoundEffectsElement(-20, 70, UIAnchor.POSITIVE, UIAnchor.CENTER, UIAnchor.POSITIVE, UIAnchor.CENTER, 6f, true);
+		soundEffectsElement = new SoundEffectsElement(-20, 70, UIAnchor.POSITIVE, UIAnchor.CENTER, UIAnchor.POSITIVE, UIAnchor.CENTER, 6f, game);
 		
 		resetGameButton.setIsHidden(true);
 		
@@ -191,10 +191,11 @@ public class GameStateInGame extends GameState {
 		
 		
 		//Disable sleep/pointing if player is out////
-		if(player.getAliveState() != 1) {
-			player.setIsSleepingAllowed(false);
-			player.setIsPointingEnabled(false);
-		}
+		if(player != null)
+			if(player.getAliveState() != 1) {
+				player.setIsSleepingAllowed(false);
+				player.setIsPointingEnabled(false);
+			}
 		
 		
 		

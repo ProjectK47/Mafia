@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.ui.ButtonElement;
+import hyperbox.mafia.ui.ControlsElement;
 import hyperbox.mafia.ui.UIAnchor;
 
 public class GameStateInGamePrepare extends GameState {
@@ -16,6 +17,8 @@ public class GameStateInGamePrepare extends GameState {
 	private ButtonElement spectateButton;
 	
 	private ButtonElement exitButton;
+	
+	private ControlsElement controlsElement;
 	
 	
 	
@@ -34,6 +37,10 @@ public class GameStateInGamePrepare extends GameState {
 		exitButton = new ButtonElement(15, 15, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, 2.75f, "Exit", () -> {
 			gameStateInGame.exitToMenu(game);
 		});
+		
+		
+		
+		controlsElement = new ControlsElement(-20, 0, UIAnchor.POSITIVE, UIAnchor.CENTER, UIAnchor.POSITIVE, UIAnchor.CENTER, 5.5f);
 	}
 	
 	
@@ -66,6 +73,8 @@ public class GameStateInGamePrepare extends GameState {
 		spectateButton.tick(game);
 		
 		exitButton.tick(game);
+		
+		controlsElement.tick(game);
 		
 		
 		
@@ -101,6 +110,8 @@ public class GameStateInGamePrepare extends GameState {
 		spectateButton.render(g, game);
 		
 		exitButton.render(g, game);
+		
+		controlsElement.render(g, game);
 	}
 
 	
