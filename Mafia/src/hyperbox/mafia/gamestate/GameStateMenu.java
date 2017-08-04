@@ -10,6 +10,7 @@ import hyperbox.mafia.core.Game;
 import hyperbox.mafia.io.ImageResources;
 import hyperbox.mafia.io.Settings;
 import hyperbox.mafia.ui.ButtonElement;
+import hyperbox.mafia.ui.AvatarSelectElement;
 import hyperbox.mafia.ui.ImageElement;
 import hyperbox.mafia.ui.SplashElement;
 import hyperbox.mafia.ui.SplashImage;
@@ -47,6 +48,7 @@ public class GameStateMenu extends GameState {
 	private ImageElement k47LogoElement;
 	
 	private TextBoxElement usernameElement;
+	private AvatarSelectElement avatarElement;
 	
 	
 	private SplashElement splashElement;
@@ -104,6 +106,8 @@ public class GameStateMenu extends GameState {
 		usernameElement = new TextBoxElement(30, 50, UIAnchor.NEGATIVE, UIAnchor.CENTER, UIAnchor.NEGATIVE, UIAnchor.CENTER,
 				25, settings.grabValue("username", "Player"), "Username", UIAnchor.NEGATIVE, 15, TextBoxElement.ALL_CHARS);
 		
+		avatarElement = new AvatarSelectElement(-15, 0, UIAnchor.POSITIVE, UIAnchor.CENTER, UIAnchor.POSITIVE, UIAnchor.CENTER, 4.25f, settings.grabValue("avatar", 0));
+		
 		
 		
 		splashElement = new SplashElement(new SplashImage(ImageResources.projectK47Logo, 0.25f, Color.BLACK));
@@ -141,6 +145,7 @@ public class GameStateMenu extends GameState {
 		hostButtonElement.tick(game);
 		
 		usernameElement.tick(game);
+		avatarElement.tick(game);
 		
 		
 		splashElement.tick(game);
@@ -180,6 +185,7 @@ public class GameStateMenu extends GameState {
 		k47LogoElement.render(g, game);
 		
 		usernameElement.render(g, game);
+		avatarElement.render(g, game);
 		
 		
 		splashElement.render(g, game);
@@ -197,6 +203,7 @@ public class GameStateMenu extends GameState {
 		settings.setValue("hostPort", hostPortElement.getText());
 		
 		settings.setValue("username", usernameElement.getText());
+		settings.setValue("avatar", avatarElement.getSelectedAvatar());
 		
 		
 		settings.writeToFile();

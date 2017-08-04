@@ -82,9 +82,10 @@ public class GameStateInGame extends GameState {
 		int port = settings.grabValueInt("connectPort");
 		
 		String username = settings.grabValueString("username");
+		int avatar = settings.grabValueInt("avatar");
 		
 		
-		profile = new PacketPlayerProfile(username);
+		profile = new PacketPlayerProfile(username, avatar);
 		
 		client = new GameClient(ip, port, profile);
 		client.startClient();

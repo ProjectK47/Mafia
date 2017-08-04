@@ -22,6 +22,9 @@ public class ImageResources {
 	public static BufferedImage textBoxLeftFocused;
 	public static BufferedImage textBoxRightFocused;
 	
+	public static BufferedImage iconBox;
+	public static BufferedImage iconBoxSelected;
+	
 	public static BufferedImage listBox;
 	public static BufferedImage speakerIcon;
 	
@@ -34,21 +37,7 @@ public class ImageResources {
 	public static BufferedImage grassBladesLeft;
 	public static BufferedImage grassBladesRight;
 	
-	public static BufferedImage player1FrontStill;
-	public static BufferedImage player1FrontWalk1;
-	public static BufferedImage player1FrontWalk2;
-	////
-	public static BufferedImage player1BackStill;
-	public static BufferedImage player1BackWalk1;
-	public static BufferedImage player1BackWalk2;
-	////
-	public static BufferedImage player1RightStill;
-	public static BufferedImage player1RightWalk1;
-	public static BufferedImage player1RightWalk2;
-	////
-	public static BufferedImage player1LeftStill;
-	public static BufferedImage player1LeftWalk1;
-	public static BufferedImage player1LeftWalk2;
+	public static BufferedImage[][] players;
 	
 	public static BufferedImage notReadyIcon;
 	public static BufferedImage readyIcon;
@@ -75,6 +64,9 @@ public class ImageResources {
 			textBoxLeftFocused = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "textBoxLeftFocused.png"));
 			textBoxRightFocused = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "textBoxRightFocused.png"));
 			
+			iconBox = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "iconBox.png"));
+			iconBoxSelected = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "iconBoxSelected.png"));
+			
 			listBox = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "listBox.png"));
 			speakerIcon = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "speakerIcon.png"));
 			
@@ -87,21 +79,30 @@ public class ImageResources {
 			grassBladesLeft = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "grassBladesLeft.png"));
 			grassBladesRight = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "grassBladesRight.png"));
 			
-			player1FrontStill = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1FrontStill.png"));
-			player1FrontWalk1 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1FrontWalk1.png"));
-			player1FrontWalk2 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1FrontWalk2.png"));
-			////
-			player1BackStill = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1BackStill.png"));
-			player1BackWalk1 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1BackWalk1.png"));
-			player1BackWalk2 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1BackWalk2.png"));
-			////
-			player1RightStill = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1RightStill.png"));
-			player1RightWalk1 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1RightWalk1.png"));
-			player1RightWalk2 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1RightWalk2.png"));
-			////
-			player1LeftStill = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1LeftStill.png"));
-			player1LeftWalk1 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1LeftWalk1.png"));
-			player1LeftWalk2 = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "player1LeftWalk2.png"));
+			
+			players = new BufferedImage[3][12];
+			
+			for(int i = 0; i < players.length; i ++) {
+				String playerPathPrefix = "players/player" + (i + 1);
+				
+				players[i][0] = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + playerPathPrefix + "FrontStill.png"));
+				players[i][1] = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + playerPathPrefix + "FrontWalk1.png"));
+				players[i][2] = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + playerPathPrefix + "FrontWalk2.png"));
+				////
+				players[i][3] = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + playerPathPrefix + "BackStill.png"));
+				players[i][4] = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + playerPathPrefix + "BackWalk1.png"));
+				players[i][5] = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + playerPathPrefix + "BackWalk2.png"));
+				////
+				players[i][6] = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + playerPathPrefix + "RightStill.png"));
+				players[i][7] = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + playerPathPrefix + "RightWalk1.png"));
+				players[i][8] = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + playerPathPrefix + "RightWalk2.png"));
+				////
+				players[i][9] = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + playerPathPrefix + "LeftStill.png"));
+				players[i][10] = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + playerPathPrefix + "LeftWalk1.png"));
+				players[i][11] = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + playerPathPrefix + "LeftWalk2.png"));
+			}
+			
+			
 			
 			notReadyIcon = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "notReadyIcon.png"));
 			readyIcon = ImageIO.read(ImageResources.class.getClassLoader().getResourceAsStream(IMAGE_RESOURCES_PATH + "readyIcon.png"));

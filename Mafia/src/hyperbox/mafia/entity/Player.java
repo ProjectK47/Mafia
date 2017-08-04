@@ -117,12 +117,7 @@ public abstract class Player extends Entity {
 	
 	
 	public Player(float x, float y, PacketPlayerProfile profile, Color nameTagColor) {
-		super(x, y, 70, 140,
-				ImageResources.player1FrontStill, ImageResources.player1FrontWalk1, ImageResources.player1FrontWalk2,
-				ImageResources.player1BackStill, ImageResources.player1BackWalk1, ImageResources.player1BackWalk2,
-				ImageResources.player1RightStill, ImageResources.player1RightWalk1, ImageResources.player1RightWalk2,
-				ImageResources.player1LeftStill, ImageResources.player1LeftWalk1, ImageResources.player1LeftWalk2);
-		
+		super(x, y, 70, 140, ImageResources.players[profile.getAvatar()]);
 		
 		this.profile = profile;
 		this.nameTagColor = nameTagColor;
