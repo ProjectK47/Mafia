@@ -9,11 +9,9 @@ import java.io.File;
 import hyperbox.mafia.core.Game;
 import hyperbox.mafia.io.ImageResources;
 import hyperbox.mafia.io.Settings;
-import hyperbox.mafia.ui.ButtonElement;
 import hyperbox.mafia.ui.AvatarSelectElement;
+import hyperbox.mafia.ui.ButtonElement;
 import hyperbox.mafia.ui.ImageElement;
-import hyperbox.mafia.ui.SplashElement;
-import hyperbox.mafia.ui.SplashImage;
 import hyperbox.mafia.ui.TextBoxElement;
 import hyperbox.mafia.ui.TextElement;
 import hyperbox.mafia.ui.UIAnchor;
@@ -51,7 +49,7 @@ public class GameStateMenu extends GameState {
 	private AvatarSelectElement avatarElement;
 	
 	
-	private SplashElement splashElement;
+	//private SplashElement splashElement;
 	
 	
 	
@@ -110,7 +108,7 @@ public class GameStateMenu extends GameState {
 		
 		
 		
-		splashElement = new SplashElement(new SplashImage(ImageResources.projectK47Logo, 0.25f, Color.BLACK));
+		//splashElement = new SplashElement(new SplashImage(ImageResources.projectK47Logo, 0.25f, Color.BLACK));
 	}
 	
 	
@@ -148,7 +146,7 @@ public class GameStateMenu extends GameState {
 		avatarElement.tick(game);
 		
 		
-		splashElement.tick(game);
+		//splashElement.tick(game);
 	}
 
 	
@@ -188,7 +186,7 @@ public class GameStateMenu extends GameState {
 		avatarElement.render(g, game);
 		
 		
-		splashElement.render(g, game);
+		//splashElement.render(g, game);
 	}
 
 	
