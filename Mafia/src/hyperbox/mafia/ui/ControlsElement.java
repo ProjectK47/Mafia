@@ -27,8 +27,10 @@ public class ControlsElement extends ListElement {
 		this.addEntry(new ListEntry("Explode player: X"));
 		this.addEntry(new ListEntry("Save player: Y"));
 		
+		this.addEntry(new ListEntry("Chat: Enter"));
+		
 		this.addEntry(new ListEntry("Exit game: Sft+Esc"));
-		this.addEntry(new ListEntry("Skip splash: Spc/Esc"));
+		//this.addEntry(new ListEntry("Skip splash: Spc/Esc"));
 	}
 	
 }

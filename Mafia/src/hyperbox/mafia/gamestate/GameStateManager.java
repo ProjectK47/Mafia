@@ -28,7 +28,7 @@ public class GameStateManager {
 		gameStateInGamePrepare = new GameStateInGamePrepare(game);
 		gameStateInGameStoryteller = new GameStateInGameStoryteller();
 		gameStateInGamePrimaries = new GameStateInGamePrimaries();
-		gameStateInGameElimination = new GameStateInGameElimination(game);
+		gameStateInGameElimination = new GameStateInGameElimination();
 		gameStateInGameEnd = new GameStateInGameEnd();
 		
 		

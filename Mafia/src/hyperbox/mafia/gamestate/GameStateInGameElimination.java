@@ -38,18 +38,16 @@ public class GameStateInGameElimination extends GameState {
 	
 	
 	
-	public GameStateInGameElimination(Game game) {
-		
-		nextStageButton = new ButtonElement(15, 15, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, 4.5f, "Next Stage", () -> {
-			moveToNextStage(game, true);
-		});
-	}
-	
 	
 	
 	@Override
 	protected void onEnable(Game game) {
 		gameStateInGame = game.getGameStateManager().getGameStateInGame();
+		
+		
+		nextStageButton = new ButtonElement(15, 15, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, UIAnchor.NEGATIVE, 4.5f, "Next Stage", () -> {
+			moveToNextStage(game, true);
+		});
 		
 		
 		currentRoundElement = new TextElement(-20, 125, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, UIAnchor.POSITIVE, UIAnchor.NEGATIVE, "", 16, new Color(255, 255, 225));

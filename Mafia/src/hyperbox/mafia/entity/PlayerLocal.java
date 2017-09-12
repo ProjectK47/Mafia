@@ -322,7 +322,7 @@ public class PlayerLocal extends Player {
 		g.setColor(Color.BLACK);
 		
 		g.fillRect(-game.getWidth() / 2, -game.getHeight() / 2, game.getWidth(), (int) (game.getHeight() / 2 * sleepBarsStage));
-		g.fillRect(-game.getWidth() / 2, game.getHeight() / 2 + 1, game.getWidth(), (int) -((game.getHeight() / 2 + 1) * sleepBarsStage));
+		g.fillRect(-game.getWidth() / 2, game.getHeight() / 2 - (int) (game.getHeight() / 2 * sleepBarsStage), game.getWidth(), (int) ((game.getHeight() / 2 + 10) * sleepBarsStage));
 	}
 	
 	

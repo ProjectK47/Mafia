@@ -2,8 +2,13 @@ package hyperbox.mafia.ui;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import hyperbox.mafia.core.Game;
@@ -161,8 +166,32 @@ public class TextBoxElement extends UIElement {
 		
 		
 		//Type////
-		ArrayList<Character> charsTyped = KeyboardInput.getCharsTyped();
+		ArrayList<Character> charsTyped = new ArrayList<Character>(KeyboardInput.getCharsTyped());
 		
+		
+		
+		//Paste from clipboard////
+		if(KeyboardInput.wasKeyTyped(KeyEvent.VK_V, true) && KeyboardInput.isKeyDown(KeyEvent.VK_CONTROL, true)) {
+			String content = null;
+			
+			
+			try {
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				content = (String) clipboard.getData(DataFlavor.stringFlavor);
+				
+			} catch (UnsupportedFlavorException | IOException e) {
+				System.out.println("Error when pasting text into TextBoxElement.");
+			}
+			
+			
+			if(content != null)
+				for(char c : content.toCharArray())
+					charsTyped.add(c);
+		}
+		
+		
+		
+		//Add typed/pasted chars to text box////
 		for(char c : charsTyped) {
 			char cLower = Character.toLowerCase(c);
 			

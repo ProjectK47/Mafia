@@ -32,7 +32,7 @@ import hyperbox.mafia.ui.UIAnchor;
 public class GameStateInGame extends GameState {
 
 	
-	public static final int MINIMUM_NUMBER_OF_PLAYERS = 5;
+	public static final int MINIMUM_NUMBER_OF_PLAYERS = 3; //TODO change to 5
 	
 	public static final float SPAWN_X = 0f;
 	public static final float SPAWN_Y = 0F;

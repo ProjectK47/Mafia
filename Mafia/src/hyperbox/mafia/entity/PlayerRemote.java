@@ -19,7 +19,7 @@ public class PlayerRemote extends Player {
 	
 	public static final Color NAME_TAG_COLOR = new Color(255, 255, 230);
 	
-	public static final float POSITION_LERP_MUL = 0.6f;
+	public static final float POSITION_LERP_MUL = 0.4f;
 
 	
 	private float goalX;

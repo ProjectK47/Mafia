@@ -6,6 +6,9 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Random;
 
 import hyperbox.mafia.gamestate.GameStateManager;
@@ -26,7 +29,7 @@ public class Game extends Canvas implements Runnable {
 	public static final int HEIGHT = 540;
 	
 	public static final String TITLE = "Mafia";
-	public static final String VERSION = "1.0";
+	public static final String VERSION = "1.0.1";
 	
 	public static final boolean RESIZABLE = true;
 	
@@ -66,8 +69,9 @@ public class Game extends Canvas implements Runnable {
 		}
 		
 		
-		window = new Window(WIDTH, HEIGHT, TITLE + " - " + VERSION, RESIZABLE);
+		disableMacAccentMenu();
 		
+		window = new Window(WIDTH, HEIGHT, TITLE + " - " + VERSION, RESIZABLE);
 		window.showWindow();
 	}
 	
@@ -273,6 +277,62 @@ public class Game extends Canvas implements Runnable {
 			server.joinThread();
 	}
 	
+	
+	
+	
+	
+	
+	private static void disableMacAccentMenu() {
+		String osName = System.getProperty("os.name").toLowerCase();
+		
+		
+		if(osName.contains("mac")) {
+			
+			Process checkProcess = runCommand("defaults read NSGlobalDomain ApplePressAndHoldEnabled");
+			BufferedReader procIn = new BufferedReader(new InputStreamReader(checkProcess.getInputStream()));
+			
+			
+			String input = null;
+			
+			try {
+				input = procIn.readLine().toLowerCase();
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.exit(-1);
+			}
+			
+			
+			boolean propertyActive = true;
+			
+			if(input.contains("false"))
+				propertyActive = false;
+			
+			
+			if(propertyActive) {
+				runCommand("defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false");
+				
+				Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+					runCommand("defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool true");
+				}));
+			}
+		}
+	}
+	
+	
+	
+	private static Process runCommand(String command) {
+		Process process = null;
+		
+		try {
+			process = Runtime.getRuntime().exec(command);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
+		
+		return process;
+	}
 	
 	
 	
