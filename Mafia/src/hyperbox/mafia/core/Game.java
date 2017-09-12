@@ -304,7 +304,7 @@ public class Game extends Canvas implements Runnable {
 			
 			boolean propertyActive = true;
 			
-			if(input.contains("false"))
+			if(input.contains("0"))
 				propertyActive = false;
 			
 			
