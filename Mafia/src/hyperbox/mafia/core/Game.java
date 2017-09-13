@@ -146,6 +146,7 @@ public class Game extends Canvas implements Runnable {
 		
 		int ticks = 0;
 		int frames = 0;
+		int iterations = 0;
 		long timer = System.currentTimeMillis();
 		
 		
@@ -174,11 +175,28 @@ public class Game extends Canvas implements Runnable {
 			
 			
 			if(System.currentTimeMillis() - timer >= 1000) {
-				System.out.println("FPS: " + frames + " TPS: " + ticks);
+				System.out.println("FPS: " + frames + " TPS: " + ticks + " IPS: " + iterations);
 				timer += 1000;
 				ticks = 0;
 				frames = 0;
+				iterations = 0;
 			}
+			
+			
+			
+			try {
+				int timeToTick = (int) ((1 - deltaTick) * nsTick / 1000000);
+				int timeToRender = (int) ((1 - deltaRender) * nsRender / 1000000);
+				
+				int timeToSleep = timeToTick > timeToRender ? timeToRender : timeToTick;
+				Thread.sleep(Math.max(1, timeToSleep));
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				System.exit(-1);
+			}
+			
+			
+			iterations ++;
 		}
 	}
 	

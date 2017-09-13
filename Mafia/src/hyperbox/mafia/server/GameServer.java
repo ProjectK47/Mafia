@@ -14,6 +14,9 @@ import hyperbox.mafia.net.PacketPlayerDisconnect;
 import hyperbox.mafia.net.PacketPlayerProfile;
 
 public class GameServer implements Runnable {
+	
+	
+	public static final int SOCKET_TIMEOUT_SECONDS = 10;
 
 	
 	
@@ -46,12 +49,29 @@ public class GameServer implements Runnable {
 	public void run() {
 		try {
 			serverSocket = new ServerSocket(port);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
+		
+		System.out.println("Server started on port: " + port);
+		
+		
+		while(true) {
+			Socket socket = null;
+			
+			try {
+				socket = serverSocket.accept();
+				socket.setSoTimeout(SOCKET_TIMEOUT_SECONDS * 1000);
+			} catch (IOException e) {
+				System.out.println("Exception in server thread when accepting connection. Closing server.");
+				closeServer();
+			}
 			
 			
-			System.out.println("Server started on port: " + port);
 			
-			while(true) {
-				Socket socket = serverSocket.accept();
+			try {
 				DataInputStream in = new DataInputStream(socket.getInputStream());
 				String ip = socket.getRemoteSocketAddress().toString();
 				
@@ -100,11 +120,26 @@ public class GameServer implements Runnable {
 				broadcastPacket(profile, client);
 				
 				System.out.println(profile.getUsername() + " - " + ip + " has logged in successfully!");
+				
+				
+			} catch(IOException e) {
+				System.out.println("Exception in server thread when verifying connection. Accepting new connection.");
+				closeSocket(socket);
 			}
-			
-		} catch (IOException e) {
-			System.out.println("Exception in server thread. Closing server.");
-			closeServer();
+		}
+	}
+	
+	
+	
+	
+	private void closeSocket(Socket socket) {
+		if(!socket.isClosed()) {
+			try {
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.exit(-1);
+			}
 		}
 	}
 	
