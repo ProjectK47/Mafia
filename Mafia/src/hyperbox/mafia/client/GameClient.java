@@ -3,6 +3,7 @@ package hyperbox.mafia.client;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +15,10 @@ import hyperbox.mafia.net.PacketPlayerProfile;
 import hyperbox.mafia.net.PacketRunnable;
 
 public class GameClient implements Runnable {
-
+	
+	
+	public static final int CONNECT_TIMEOUT_SECONDS = 10;
+	
 	
 	
 	private String ip;
@@ -59,7 +63,8 @@ public class GameClient implements Runnable {
 	@Override
 	public void run() {
 		try {
-			socket = new Socket(ip, port);
+			socket = new Socket();
+			socket.connect(new InetSocketAddress(ip, port), CONNECT_TIMEOUT_SECONDS * 1000);
 			
 			in = new DataInputStream(socket.getInputStream());
 			out = new DataOutputStream(socket.getOutputStream());

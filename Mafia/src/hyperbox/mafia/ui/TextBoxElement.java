@@ -171,7 +171,7 @@ public class TextBoxElement extends UIElement {
 		
 		
 		//Paste from clipboard////
-		if(KeyboardInput.wasKeyTyped(KeyEvent.VK_V, true) && KeyboardInput.isKeyDown(KeyEvent.VK_CONTROL, true)) {
+		if(KeyboardInput.wasKeyTyped(KeyEvent.VK_V, true) && (KeyboardInput.isKeyDown(KeyEvent.VK_CONTROL, true) || KeyboardInput.isKeyDown(KeyEvent.VK_META, true))) {
 			String content = null;
 			
 			
