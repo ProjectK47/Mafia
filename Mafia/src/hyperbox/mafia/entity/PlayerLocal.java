@@ -76,9 +76,23 @@ public class PlayerLocal extends Player {
 	@Override
 	protected void onTick(Game game) {
 		
-		//Move////
-		if(!isSleeping) {
-		
+		if(!isSleeping) {	
+			//Turn////
+			if(KeyboardInput.isKeyDown(KeyEvent.VK_LEFT, false))
+				direction = 3;
+				
+			if(KeyboardInput.isKeyDown(KeyEvent.VK_RIGHT, false))
+				direction = 2;
+			
+			if(KeyboardInput.isKeyDown(KeyEvent.VK_UP, false))
+				direction = 1;
+			
+			if(KeyboardInput.isKeyDown(KeyEvent.VK_DOWN, false))
+				direction = 0;
+			
+			
+			
+			//Move////
 			if(KeyboardInput.isKeyDown(KeyEvent.VK_A, false)) {
 				velocityX -= VELOCITY_INCREASE;
 				

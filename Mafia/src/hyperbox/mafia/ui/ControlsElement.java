@@ -14,10 +14,8 @@ public class ControlsElement extends ListElement {
 	
 	
 	private void addControls() {
-		this.addEntry(new ListEntry("Move up: W"));
-		this.addEntry(new ListEntry("Move down: S"));
-		this.addEntry(new ListEntry("Move left: A"));
-		this.addEntry(new ListEntry("Move right: D"));
+		this.addEntry(new ListEntry("Move: WASD"));
+		this.addEntry(new ListEntry("Turn: Arrows"));
 		
 		this.addEntry(new ListEntry("Sleep: Space"));
 		

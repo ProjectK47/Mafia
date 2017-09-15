@@ -155,7 +155,7 @@ public class GameStateInGameElimination extends GameState {
 		
 		
 		//Enable End state////
-		boolean isPlayerAlive = false;
+		int numOfPlayersAlive = 0;
 		
 		for(String username : players.keySet()) {
 			Player player = players.get(username);
@@ -166,14 +166,12 @@ public class GameStateInGameElimination extends GameState {
 				continue;
 			
 			
-			if(player.getAliveState() == 1) {
-				isPlayerAlive = true;
-				break;
-			}
+			if(player.getAliveState() == 1)
+				numOfPlayersAlive ++;
 		}
 		
 		
-		if(!isPlayerAlive || players.get(gameStateInGame.getMafiaUsername()).getAliveState() != 1) {
+		if(numOfPlayersAlive <= 1 || players.get(gameStateInGame.getMafiaUsername()).getAliveState() != 1) {
 			this.disable(game);
 			game.getGameStateManager().getGameStateInGameEnd().enable(game);
 		}
