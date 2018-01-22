@@ -29,7 +29,7 @@ public class Game extends Canvas implements Runnable {
 	public static final int HEIGHT = 540;
 	
 	public static final String TITLE = "Mafia";
-	public static final String VERSION = "1.0.1";
+	public static final String VERSION = "1.0.2";
 	
 	public static final boolean RESIZABLE = true;
 	
@@ -59,17 +59,24 @@ public class Game extends Canvas implements Runnable {
 	
 	
 	public static void main(String[] args) {
+		boolean shouldRunMacFix = true;
+		
+		
 		if(args.length >= 2) {
 			if(args[0].equalsIgnoreCase("-server")) {
 				int port = Integer.parseInt(args[1]);
 				
 				startGameServer(port, true);
 				return;
+				
+			} else if(args[0].equalsIgnoreCase("-useMacFix")) {
+				shouldRunMacFix = Boolean.parseBoolean(args[1]);
 			}
 		}
 		
 		
-		disableMacAccentMenu();
+		if(shouldRunMacFix)
+			disableMacAccentMenu();
 		
 		window = new Window(WIDTH, HEIGHT, TITLE + " - " + VERSION, RESIZABLE);
 		window.showWindow();
@@ -313,7 +320,7 @@ public class Game extends Canvas implements Runnable {
 			String input = null;
 			
 			try {
-				input = procIn.readLine().toLowerCase();
+				input = procIn.readLine();
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.exit(-1);
@@ -322,8 +329,9 @@ public class Game extends Canvas implements Runnable {
 			
 			boolean propertyActive = true;
 			
-			if(input.contains("0"))
-				propertyActive = false;
+			if(input != null)
+				if(input.toLowerCase().contains("0"))
+					propertyActive = false;
 			
 			
 			if(propertyActive) {
